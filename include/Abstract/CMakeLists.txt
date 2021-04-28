@@ -1,0 +1,3 @@
+target_sources(${WHACK_A_STOODENT_SERVER_PROJECT} PRIVATE
+	"${CMAKE_CURRENT_SOURCE_DIR}/ASerializableMessage.hpp"
+)

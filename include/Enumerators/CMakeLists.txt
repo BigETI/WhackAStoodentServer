@@ -1,0 +1,9 @@
+target_sources(${WHACK_A_STOODENT_SERVER_PROJECT} PRIVATE
+	"${CMAKE_CURRENT_SOURCE_DIR}/EDenyPlayRequestReason.hpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/EDisconnectionReason.hpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/EErrorType.hpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ELogLevel.hpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ELookHole.hpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/EMessageType.hpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/EPlayerRole.hpp"
+)
