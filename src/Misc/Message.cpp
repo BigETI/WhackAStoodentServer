@@ -2,19 +2,15 @@
 
 #include <Misc/Message.hpp>
 
-WhackAStoodentServer::Message::Message(const std::vector<std::uint8_t>& data, std::shared_ptr<WhackAStoodentServer::Peer> peer) : data(data), peer(peer)
+WhackAStoodentServer::Message::Message(const std::vector<std::uint8_t>& data) : data(data)
 {
 	if (data.size() < static_cast<std::size_t>(1))
 	{
 		throw std::invalid_argument("\"data\" is smaller than one.");
 	}
-	if (!peer)
-	{
-		throw std::invalid_argument("\"peer\" is null.");
-	}
 }
 
-WhackAStoodentServer::Message::Message(std::uint8_t* data, std::size_t size, std::shared_ptr<WhackAStoodentServer::Peer> peer) : data(data, data + size), peer(peer)
+WhackAStoodentServer::Message::Message(std::uint8_t* data, std::size_t size) : data(data, data + size)
 {
 	if (!data)
 	{
@@ -23,10 +19,6 @@ WhackAStoodentServer::Message::Message(std::uint8_t* data, std::size_t size, std
 	if (size < static_cast<std::size_t>(1))
 	{
 		throw std::invalid_argument("\"size\" is smaller than one.");
-	}
-	if (!peer)
-	{
-		throw std::invalid_argument("\"peer\" is null.");
 	}
 }
 
@@ -49,14 +41,4 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Message::GetData(std::vector<st
 std::size_t WhackAStoodentServer::Message::GetDataSize() const
 {
 	return data.size() - static_cast<std::size_t>(1);
-}
-
-const WhackAStoodentServer::Peer& WhackAStoodentServer::Message::GetPeer() const
-{
-	return *peer;
-}
-
-WhackAStoodentServer::Peer& WhackAStoodentServer::Message::GetPeer()
-{
-	return *peer;
 }

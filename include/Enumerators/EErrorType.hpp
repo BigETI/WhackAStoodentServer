@@ -8,8 +8,10 @@ namespace WhackAStoodentServer
 
 		Internal,
 
-		InvalidMessageID,
+		UnsupportedMessageType,
 
-		MalformedMessage
+		MalformedMessage,
+
+		InvalidMessageContext
 	};
 }

@@ -13,6 +13,16 @@ namespace WhackAStoodentServer
 	{
 	public:
 
+		Event<> OnConnected;
+
+		Event<> OnDisconnected;
+
+		Event<std::int32_t> OnPingReceived;
+
+		Event<std::int32_t> OnPongReceived;
+
+		Event<> OnMatchHistoryRequested;
+
 		User() = delete;
 		User(const User&) = delete;
 		User(User&&) = delete;

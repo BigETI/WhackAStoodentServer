@@ -24,6 +24,7 @@
 #include <Messages/PongMessage.hpp>
 #include <Misc/MatchHistoryEntry.hpp>
 #include <Misc/Message.hpp>
+#include <Misc/MessageParser.hpp>
 #include <Misc/Server.hpp>
 #include <Static/ENetInitializer.hpp>
 #include <Static/Rules.hpp>
@@ -36,6 +37,285 @@ WhackAStoodentServer::Server::Server(std::uint16_t port, std::uint32_t timeoutTi
 		throw InvalidNetworkPortException(port);
 	}
 	ENetInitializer::Initialize();
+	AddMessageParser<WhackAStoodentServer::Messages::ErrorMessage>
+	(
+		[](std::shared_ptr<WhackAStoodentServer::Peer> peer, const WhackAStoodentServer::Messages::ErrorMessage& message)
+		{
+			peer->OnErrorReceived(message.GetErrorType(), message.GetErrorMessage());
+		},
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, std::shared_ptr<WhackAStoodentServer::Message> message)
+		{
+			HandleMessageParseFailedEvent(peer, message);
+		}
+	);
+	AddMessageParser<WhackAStoodentServer::Messages::AuthenticateMessage>
+	(
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, const WhackAStoodentServer::Messages::AuthenticateMessage& message)
+		{
+			uuids::uuid user_id(message.GetUserID());
+			std::wstring name(message.GetUsername());
+			if (users.contains(peer->GetIncomingID()))
+			{
+				peer->SendPeerMessage<WhackAStoodentServer::Messages::ErrorMessage>(EErrorType::InvalidMessageContext, L"You are already authenticated.");
+			}
+			else if (!user_id.is_nil() && userIDToPeerIDLookup.contains(user_id))
+			{
+				peer->SendPeerMessage<WhackAStoodentServer::Messages::ErrorMessage>(EErrorType::Internal, L"User ID is already occupied.");
+			}
+			else
+			{
+				while (user_id.is_nil())
+				{
+					WhackAStoodentServer::UUIDs::CreateNewUUID(user_id);
+					if (userIDToPeerIDLookup.contains(user_id))
+					{
+						user_id = uuids::uuid();
+					}
+				}
+				if (name.length() > WhackAStoodentServer::Rules::MaximalNameLength)
+				{
+					name = name.substr(static_cast<std::size_t>(0), WhackAStoodentServer::Rules::MaximalNameLength);
+				}
+				std::shared_ptr<WhackAStoodentServer::User> user(std::make_shared<WhackAStoodentServer::User>(peer, user_id, name, 0L));
+				user->OnConnected += [&, user]()
+				{
+					OnUserConnected(user);
+				};
+				user->OnDisconnected += [&, user]()
+				{
+					OnUserDisconnected(user);
+				};
+				users.insert_or_assign(peer->GetIncomingID(), user);
+				user->OnConnected();
+			}
+		},
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, std::shared_ptr<WhackAStoodentServer::Message> message)
+		{
+			HandleMessageParseFailedEvent(peer, message);
+		}
+	);
+	AddMessageParser<WhackAStoodentServer::Messages::PingMessage>
+	(
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, const WhackAStoodentServer::Messages::PingMessage& message)
+		{
+			AssertPeerIsAuthenticated
+			(
+				peer,
+				[peer, messageData(std::move(message))](std::shared_ptr<User> user)
+				{
+					std::int32_t ping_data(messageData.GetPingData());
+					user->OnPingReceived(ping_data);
+					peer->SendPeerMessage<WhackAStoodentServer::Messages::PongMessage>(ping_data);
+				}
+			);
+		},
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, std::shared_ptr<WhackAStoodentServer::Message> message)
+		{
+			HandleMessageParseFailedEvent(peer, message);
+		}
+	);
+	AddMessageParser<WhackAStoodentServer::Messages::PongMessage>
+	(
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, const WhackAStoodentServer::Messages::PongMessage& message)
+		{
+			AssertPeerIsAuthenticated
+			(
+				peer,
+				[messageData(std::move(message))](std::shared_ptr<User> user)
+				{
+					std::int32_t pong_data(messageData.GetPongData());
+					user->OnPongReceived(pong_data);
+				}
+			);
+		},
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, std::shared_ptr<WhackAStoodentServer::Message> message)
+		{
+			HandleMessageParseFailedEvent(peer, message);
+		}
+	);
+	AddMessageParser<WhackAStoodentServer::Messages::GetMatchHistoryMessage>
+	(
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, const WhackAStoodentServer::Messages::GetMatchHistoryMessage& message)
+		{
+			AssertPeerIsAuthenticated
+			(
+				peer,
+				[peer](std::shared_ptr<User> user)
+				{
+					std::vector<WhackAStoodentServer::MatchHistoryEntry> match_history;
+					user->OnMatchHistoryRequested();
+					// TODO: Get match history
+					peer->SendPeerMessage<WhackAStoodentServer::Messages::MatchHistoryMessage>(match_history);
+				}
+			);
+		},
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, std::shared_ptr<WhackAStoodentServer::Message> message)
+		{
+			HandleMessageParseFailedEvent(peer, message);
+		}
+	);
+	AddMessageParser<WhackAStoodentServer::Messages::PlayWithRandomMessage>
+	(
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, const WhackAStoodentServer::Messages::PlayWithRandomMessage& message)
+		{
+			AssertPeerIsAuthenticated
+			(
+				peer,
+				[](std::shared_ptr<User> user)
+				{
+					// TODO: Find someone to match with
+				}
+			);
+		},
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, std::shared_ptr<WhackAStoodentServer::Message> message)
+		{
+			HandleMessageParseFailedEvent(peer, message);
+		}
+	);
+	AddMessageParser<WhackAStoodentServer::Messages::PlayWithSessionCodeMessage>
+	(
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, const WhackAStoodentServer::Messages::PlayWithSessionCodeMessage& message)
+		{
+			AssertPeerIsAuthenticated
+			(
+				peer,
+				[](std::shared_ptr<User> user)
+				{
+					// TODO: Find session to match with
+				}
+			);
+		},
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, std::shared_ptr<WhackAStoodentServer::Message> message)
+		{
+			HandleMessageParseFailedEvent(peer, message);
+		}
+	);
+	AddMessageParser<WhackAStoodentServer::Messages::AcceptPlayRequestMessage>
+	(
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, const WhackAStoodentServer::Messages::AcceptPlayRequestMessage& message)
+		{
+			AssertPeerIsAuthenticated
+			(
+				peer,
+				[](std::shared_ptr<User> user)
+				{
+					// TODO: Process user accepting play request
+				}
+			);
+		},
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, std::shared_ptr<WhackAStoodentServer::Message> message)
+		{
+			HandleMessageParseFailedEvent(peer, message);
+		}
+	);
+	AddMessageParser<WhackAStoodentServer::Messages::DenyPlayRequestMessage>
+	(
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, const WhackAStoodentServer::Messages::DenyPlayRequestMessage& message)
+		{
+			AssertPeerIsAuthenticated
+			(
+				peer,
+				[](std::shared_ptr<User> user)
+				{
+					// TODO: Process user denying play request
+				}
+			);
+		},
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, std::shared_ptr<WhackAStoodentServer::Message> message)
+		{
+			HandleMessageParseFailedEvent(peer, message);
+		}
+	);
+	AddMessageParser<WhackAStoodentServer::Messages::LoadedGameMessage>
+	(
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, const WhackAStoodentServer::Messages::LoadedGameMessage& message)
+		{
+			AssertPeerIsInGame
+			(
+				peer,
+				[](std::shared_ptr<User> user, std::shared_ptr<Game> game)
+				{
+					// TODO: Process user loaded game
+				}
+			);
+		},
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, std::shared_ptr<WhackAStoodentServer::Message> message)
+		{
+			HandleMessageParseFailedEvent(peer, message);
+		}
+	);
+	AddMessageParser<WhackAStoodentServer::Messages::HitMessage>
+	(
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, const WhackAStoodentServer::Messages::HitMessage& message)
+		{
+			AssertPeerIsInGame
+			(
+				peer,
+				[](std::shared_ptr<User> user, std::shared_ptr<Game> game)
+				{
+					// TODO: Process user loaded game
+				}
+			);
+		},
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, std::shared_ptr<WhackAStoodentServer::Message> message)
+		{
+			HandleMessageParseFailedEvent(peer, message);
+		}
+	);
+	AddMessageParser<WhackAStoodentServer::Messages::LookMessage>
+	(
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, const WhackAStoodentServer::Messages::LookMessage& message)
+		{
+			AssertPeerIsInGame
+			(
+				peer,
+				[](std::shared_ptr<User> user, std::shared_ptr<Game> game)
+				{
+					// TODO: Process user looking
+				}
+			);
+		},
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, std::shared_ptr<WhackAStoodentServer::Message> message)
+		{
+			HandleMessageParseFailedEvent(peer, message);
+		}
+	);
+	AddMessageParser<WhackAStoodentServer::Messages::HideMessage>
+	(
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, const WhackAStoodentServer::Messages::HideMessage& message)
+		{
+			AssertPeerIsInGame
+			(
+				peer,
+				[](std::shared_ptr<User> user, std::shared_ptr<Game> game)
+				{
+					// TODO: Process user hiding
+				}
+			);
+		},
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, std::shared_ptr<WhackAStoodentServer::Message> message)
+		{
+			HandleMessageParseFailedEvent(peer, message);
+		}
+	);
+	AddMessageParser<WhackAStoodentServer::Messages::LogMessage>
+	(
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, const WhackAStoodentServer::Messages::LogMessage& message)
+		{
+			AssertPeerIsAuthenticated
+			(
+				peer,
+				[](std::shared_ptr<User> user)
+				{
+					// TODO: Log message
+				}
+			);
+		},
+		[&](std::shared_ptr<WhackAStoodentServer::Peer> peer, std::shared_ptr<WhackAStoodentServer::Message> message)
+		{
+			HandleMessageParseFailedEvent(peer, message);
+		}
+	);
 }
 
 WhackAStoodentServer::Server::~Server()
@@ -104,7 +384,21 @@ bool WhackAStoodentServer::Server::ProcessMessages()
 					{
 						std::shared_ptr<WhackAStoodentServer::Peer> peer(std::make_shared<WhackAStoodentServer::Peer>(enet_event.peer));
 						peers.insert_or_assign(enet_event.peer->incomingPeerID, peer);
-						OnPeerConnectionAttempted(peer);
+						peer->OnConnectionAttempted += [&, peer]()
+						{
+							OnPeerConnectionAttempted(peer);
+						};
+						peer->OnConnected += [&, peer]()
+						{
+							OnPeerConnected(peer);
+						};
+						peer->OnDisconnected += [&, peer]()
+						{
+							OnPeerDisconnected(peer);
+						};
+						peer->OnConnectionAttempted();
+						// TOOD: Check if peer is banned
+						peer->OnConnected();
 					}
 					break;
 				case ENET_EVENT_TYPE_DISCONNECT:
@@ -113,13 +407,13 @@ bool WhackAStoodentServer::Server::ProcessMessages()
 						auto peers_iterator = peers.find(enet_event.peer->incomingPeerID);
 						if (users_iterator != users.end())
 						{
-							OnUserDisconnected(users_iterator->second);
+							users_iterator->second->OnDisconnected();
 							userIDToPeerIDLookup.erase(users_iterator->second->GetUserID());
 							users.erase(users_iterator);
 						}
 						if (peers_iterator != peers.end())
 						{
-							OnPeerDisconnected(peers_iterator->second);
+							peers_iterator->second->OnDisconnected();
 							peers.erase(peers_iterator);
 						}
 					}
@@ -131,188 +425,22 @@ bool WhackAStoodentServer::Server::ProcessMessages()
 						{
 							try
 							{
-								std::shared_ptr<WhackAStoodentServer::Message> message(std::make_shared<WhackAStoodentServer::Message>(enet_event.packet->data, enet_event.packet->dataLength, peers_iterator->second));
-								OnPeerMessageReceived(message);
-								switch (message->GetMessageType())
+								std::shared_ptr<WhackAStoodentServer::Peer> peer(peers_iterator->second);
+								std::shared_ptr<WhackAStoodentServer::Message> message(std::make_shared<WhackAStoodentServer::Message>(enet_event.packet->data, enet_event.packet->dataLength));
+								EMessageType message_type(message->GetMessageType());
+								auto message_parser_list_iterator(messageParserLists.find(message_type));
+								if (message_parser_list_iterator == messageParserLists.end())
 								{
-								case EMessageType::Error:
+									peer->OnUnsupportedMessageTypeReceived(message_type);
+									peer->SendPeerMessage<Messages::ErrorMessage>(EErrorType::UnsupportedMessageType, L"Unsupported message type \"" + std::to_wstring(static_cast<int>(message_type)) + L"\" has been received.");
+								}
+								else
+								{
+									peer->OnMessageReceived(message);
+									for (const auto& message_parser : message_parser_list_iterator->second)
 									{
-										WhackAStoodentServer::Messages::ErrorMessage message_data;
-										if (message->TryGetData(message_data))
-										{
-											// TODO: Process error message
-										}
+										message_parser->ParsePeerMessage(peer, message);
 									}
-									break;
-								case EMessageType::Authenticate:
-									{
-										WhackAStoodentServer::Messages::AuthenticateMessage message_data;
-										if (message->TryGetData(message_data))
-										{
-											uuids::uuid user_id(message_data.GetUserID());
-											std::wstring name(message_data.GetUsername());
-											
-											if (users.contains(message->GetPeer().GetIncomingID()))
-											{
-												// TODO: Notify user that it is already authenticated
-											}
-											else if (!user_id.is_nil() && userIDToPeerIDLookup.contains(user_id))
-											{
-												// TODO: Notify error
-											}
-											else
-											{
-												while (user_id.is_nil())
-												{
-													WhackAStoodentServer::UUIDs::CreateNewUUID(user_id);
-													if (userIDToPeerIDLookup.contains(user_id))
-													{
-														user_id = uuids::uuid();
-													}
-												}
-												if (name.length() > WhackAStoodentServer::Rules::MaximalNameLength)
-												{
-													name = name.substr(static_cast<std::size_t>(0), WhackAStoodentServer::Rules::MaximalNameLength);
-												}
-												std::shared_ptr<WhackAStoodentServer::User> user(std::make_shared<WhackAStoodentServer::User>(peers_iterator->second, user_id, name, 0L));
-												users.insert_or_assign(message->GetPeer().GetIncomingID(), user);
-												OnUserAuthenticated(user);
-											}
-										}
-									}
-									break;
-								case EMessageType::Ping:
-									{
-										WhackAStoodentServer::Messages::PingMessage message_data;
-										if (message->TryGetData(message_data))
-										{
-											auto user_iterator(users.find(message->GetPeer().GetIncomingID()));
-											if (user_iterator == users.end())
-											{
-												// TODO: Error
-											}
-											else
-											{
-												std::int32_t ping_data(message_data.GetPingData());
-												OnUserPingReceived(user_iterator->second, ping_data);
-												message->GetPeer().SendPeerMessage<Messages::PongMessage>(ping_data);
-											}
-										}
-									}
-									break;
-								case EMessageType::Pong:
-									{
-										WhackAStoodentServer::Messages::PongMessage message_data;
-										if (message->TryGetData(message_data))
-										{
-											auto user_iterator(users.find(message->GetPeer().GetIncomingID()));
-											if (user_iterator == users.end())
-											{
-												// TODO: Error
-											}
-											else
-											{
-												std::int32_t pong_data(message_data.GetPongData());
-												OnUserPongReceived(user_iterator->second, pong_data);
-											}
-										}
-									}
-									break;
-								case EMessageType::GetMatchHistory:
-									{
-										WhackAStoodentServer::Messages::GetMatchHistoryMessage message_data;
-										if (message->TryGetData(message_data))
-										{
-											std::vector<WhackAStoodentServer::MatchHistoryEntry> match_history;
-											// TODO: Fetch match history
-											message->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::MatchHistoryMessage>(match_history);
-										}
-									}
-									break;
-								case EMessageType::PlayWithRandom:
-									{
-										WhackAStoodentServer::Messages::PlayWithRandomMessage message_data;
-										if (message->TryGetData(message_data))
-										{
-											// TODO: Find someone to match with
-										}
-									}
-									break;
-								case EMessageType::PlayWithSessionCode:
-									{
-										WhackAStoodentServer::Messages::PlayWithSessionCodeMessage message_data;
-										if (message->TryGetData(message_data))
-										{
-											// TODO: Find session to match with
-										}
-									}
-									break;
-								case EMessageType::AcceptPlayRequest:
-									{
-										WhackAStoodentServer::Messages::AcceptPlayRequestMessage message_data;
-										if (message->TryGetData(message_data))
-										{
-											// TODO: Process user accepting play request
-										}
-									}
-									break;
-								case EMessageType::DenyPlayRequest:
-									{
-										WhackAStoodentServer::Messages::DenyPlayRequestMessage message_data;
-										if (message->TryGetData(message_data))
-										{
-											// TODO: Process user denying play request
-										}
-									}
-									break;
-								case EMessageType::LoadedGame:
-									{
-										WhackAStoodentServer::Messages::LoadedGameMessage message_data;
-										if (message->TryGetData(message_data))
-										{
-											// TODO: Process user loaded game
-										}
-									}
-									break;
-								case EMessageType::Hit:
-									{
-										WhackAStoodentServer::Messages::HitMessage message_data;
-										if (message->TryGetData(message_data))
-										{
-											// TODO: Process user loaded game
-										}
-									}
-									break;
-								case EMessageType::Look:
-									{
-										WhackAStoodentServer::Messages::LookMessage message_data;
-										if (message->TryGetData(message_data))
-										{
-											// TODO: Process user looking
-										}
-									}
-									break;
-								case EMessageType::Hide:
-									{
-										WhackAStoodentServer::Messages::HideMessage message_data;
-										if (message->TryGetData(message_data))
-										{
-											// TODO: Process user hiding
-										}
-									}
-									break;
-								case EMessageType::Log:
-									{
-										WhackAStoodentServer::Messages::LogMessage message_data;
-										if (message->TryGetData(message_data))
-										{
-											// TODO: Log message
-										}
-									}
-									break;
-								default:
-									// TODO: Notify error
-									break;
 								}
 							}
 							catch (const std::exception& e)
@@ -324,7 +452,7 @@ bool WhackAStoodentServer::Server::ProcessMessages()
 					}
 					break;
 				default:
-					// TODO: Notify error
+					std::cerr << "Invalid ENet event type \"" << enet_event.type << "\"" << std::endl;
 					break;
 				}
 			}
@@ -336,4 +464,34 @@ bool WhackAStoodentServer::Server::ProcessMessages()
 		}
 	}
 	return ret;
+}
+
+void WhackAStoodentServer::Server::HandleMessageParseFailedEvent(std::shared_ptr<WhackAStoodentServer::Peer> peer, std::shared_ptr<WhackAStoodentServer::Message> message)
+{
+	peer->SendPeerMessage<Messages::ErrorMessage>(EErrorType::MalformedMessage, L"Failed to parse message type \"" + std::to_wstring(static_cast<int>(message->GetMessageType())) + L"\"");
+}
+
+void WhackAStoodentServer::Server::AssertPeerIsAuthenticated(std::shared_ptr<WhackAStoodentServer::Peer> peer, std::function<void(std::shared_ptr<WhackAStoodentServer::User> user)> onPeerIsAuthenticated)
+{
+	auto user_iterator(users.find(peer->GetIncomingID()));
+	if (user_iterator == users.end())
+	{
+		peer->SendPeerMessage<Messages::ErrorMessage>(EErrorType::InvalidMessageContext, L"You are not authenticated.");
+	}
+	else
+	{
+		onPeerIsAuthenticated(user_iterator->second);
+	}
+}
+
+void WhackAStoodentServer::Server::AssertPeerIsInGame(std::shared_ptr<WhackAStoodentServer::Peer> peer, std::function<void(std::shared_ptr<WhackAStoodentServer::User> user, std::shared_ptr<WhackAStoodentServer::Game> game)> onPeerIsInGame)
+{
+	AssertPeerIsAuthenticated
+	(
+		peer,
+		[](std::shared_ptr<User> user)
+		{
+			// TODO: Assert that peer is in game
+		}
+	);
 }

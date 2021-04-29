@@ -8,7 +8,6 @@
 #include <Enumerators/EMessageType.hpp>
 #include <Exceptions/DeserializationFailedException.hpp>
 #include <Interfaces/ISerializableMessage.hpp>
-#include <Misc/Peer.hpp>
 
 namespace WhackAStoodentServer
 {
@@ -20,9 +19,9 @@ namespace WhackAStoodentServer
 		Message(const Message&) = delete;
 		Message(Message&&) = delete;
 
-		Message(const std::vector<std::uint8_t>& data, std::shared_ptr<Peer> peer);
+		Message(const std::vector<std::uint8_t>& data);
 
-		Message(std::uint8_t *data, std::size_t size, std::shared_ptr<Peer> peer);
+		Message(std::uint8_t *data, std::size_t size);
 
 		EMessageType GetMessageType() const;
 
@@ -48,14 +47,8 @@ namespace WhackAStoodentServer
 			return ret;
 		}
 
-		const Peer& GetPeer() const;
-
-		Peer& GetPeer();
-
 	private:
 
 		std::vector<std::uint8_t> data;
-
-		std::shared_ptr<Peer> peer;
 	};
 }
