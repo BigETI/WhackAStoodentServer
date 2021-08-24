@@ -68,11 +68,13 @@ target_sources(${WHACK_A_STOODENT_SERVER_PROJECT} PRIVATE
 	"${CMAKE_CURRENT_SOURCE_DIR}/Static/CollectionSerializer.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Static/Defaults.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Static/ENetInitializer.hpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/Static/IPUtilities.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Static/Main.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Static/NumericCollectionSerializer.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Static/NumericSerializer.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Static/Rules.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Static/SessionCodes.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Static/StringSerializer.hpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/Static/StringUtilities.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Static/UUIDs.hpp"
 )
