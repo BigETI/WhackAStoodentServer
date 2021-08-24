@@ -5,6 +5,7 @@
 #include <functional>
 #include <type_traits>
 #include <memory>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -82,7 +83,11 @@ namespace WhackAStoodentServer
 
 		std::unordered_map<std::uint16_t, std::shared_ptr<User>> users;
 
+		std::unordered_map<uuids::uuid, std::shared_ptr<Game>> games;
+
 		std::unordered_map<uuids::uuid, std::uint16_t> userIDToPeerIDLookup;
+
+		std::unordered_map<std::string, std::shared_ptr<User>> sessionCodeToUserIDLookup;
 
 		std::unordered_map<EMessageType, std::forward_list<std::shared_ptr<IMessageParser>>> messageParserLists;
 

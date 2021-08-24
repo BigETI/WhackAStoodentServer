@@ -7,7 +7,7 @@ WhackAStoodentServer::Peer::Peer(ENetPeer* peer) : peer(peer)
 {
 	if (!peer)
 	{
-		throw std::invalid_argument("\"peer\" is null.");
+		throw std::invalid_argument("Parameter \"peer\" is null.");
 	}
 }
 

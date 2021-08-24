@@ -6,7 +6,7 @@ WhackAStoodentServer::Message::Message(const std::vector<std::uint8_t>& data) : 
 {
 	if (data.size() < static_cast<std::size_t>(1))
 	{
-		throw std::invalid_argument("\"data\" is smaller than one.");
+		throw std::invalid_argument("Parameter \"data\" is smaller than one.");
 	}
 }
 
@@ -14,11 +14,11 @@ WhackAStoodentServer::Message::Message(std::uint8_t* data, std::size_t size) : d
 {
 	if (!data)
 	{
-		throw std::invalid_argument("\"data\" is null.");
+		throw std::invalid_argument("Parameter \"data\" is null.");
 	}
 	if (size < static_cast<std::size_t>(1))
 	{
-		throw std::invalid_argument("\"size\" is smaller than one.");
+		throw std::invalid_argument("Parameter \"size\" is smaller than one.");
 	}
 }
 

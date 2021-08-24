@@ -64,16 +64,20 @@ target_include_directories(${WHACK_A_STOODENT_SERVER_PROJECT} PUBLIC "include")
 #                                  #
 ####################################
 
-find_package(enet 1.3.17 REQUIRED)
+#find_package(enet 1.3.17 REQUIRED)
 find_package(nlohmann_json 1.3.17 REQUIRED)
 
 # stduuid from conan.io is broken, because GSL has issues
 # find_package(stduuid 1.0 REQUIRED)
 target_include_directories(${WHACK_A_STOODENT_SERVER_PROJECT} PUBLIC "dependencies/stduuid/include")
+target_include_directories(${WHACK_A_STOODENT_SERVER_PROJECT} PUBLIC "dependencies/enet/include")
 
-target_link_libraries(${WHACK_A_STOODENT_SERVER_PROJECT} PUBLIC
-	enet::enet
-	# stduuid::stduuid
-)
+if (WIN32)
+	target_link_libraries(${WHACK_A_STOODENT_SERVER_PROJECT} PUBLIC
+		enet
+		winmm
+		ws2_32
+	)
+endif()
 
 unset(WHACK_A_STOODENT_SERVER_PROJECT)

@@ -2,6 +2,7 @@
 
 #include <Exceptions/DeserializationFailedException.hpp>
 #include <Messages/PlayWithSessionCodeMessage.hpp>
+#include <Static/SessionCodes.hpp>
 
 WhackAStoodentServer::Messages::PlayWithSessionCodeMessage::PlayWithSessionCodeMessage() :
 	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::PlayWithSessionCode>(),
@@ -14,16 +15,9 @@ WhackAStoodentServer::Messages::PlayWithSessionCodeMessage::PlayWithSessionCodeM
 	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::PlayWithSessionCode>(),
 	sessionCode(sessionCode)
 {
-	if (sessionCode.length() != SessionCodeCharacterCount)
+	if (!SessionCodes::IsSessionCodeValid(sessionCode))
 	{
-		throw std::invalid_argument("Parameter \"sessionCode\" must be 6 characters long.");
-	}
-	for (const char& character : sessionCode)
-	{
-		if (!std::isalnum(character))
-		{
-			throw std::invalid_argument("Parameter \"sessionID\" must be alpha numeric.");
-		}
+		throw std::invalid_argument("Parameter \"sessionCode\" is not valid.");
 	}
 }
 

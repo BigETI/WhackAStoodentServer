@@ -31,7 +31,7 @@ namespace WhackAStoodentServer
 		{
 			if (!onPeerMessageParsed)
 			{
-				throw std::invalid_argument("\"onPeerMessageParsed\" is null.");
+				throw std::invalid_argument("Parameter \"onPeerMessageParsed\" is null.");
 			}
 		}
 
@@ -44,11 +44,11 @@ namespace WhackAStoodentServer
 		{
 			if (!peer)
 			{
-				throw std::invalid_argument("\"peer\" is null.");
+				throw std::invalid_argument("Parameter \"peer\" is null.");
 			}
 			if (!message)
 			{
-				throw std::invalid_argument("\"message\" is null.");
+				throw std::invalid_argument("Parameter \"message\" is null.");
 			}
 			if (message->GetMessageType() == T::MessageType)
 			{

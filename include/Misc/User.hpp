@@ -27,7 +27,7 @@ namespace WhackAStoodentServer
 		User(const User&) = delete;
 		User(User&&) = delete;
 
-		User(std::shared_ptr<Peer> peer, uuids::uuid userID, const std::wstring& name, std::int64_t score);
+		User(std::shared_ptr<Peer> peer, uuids::uuid userID, const std::wstring& name, const std::string& sessionCode, std::int64_t score);
 
 		virtual ~User();
 
@@ -41,6 +41,14 @@ namespace WhackAStoodentServer
 
 		virtual void SetName(const std::wstring& newName);
 
+		virtual const std::string& GetSessionCode() const;
+
+		virtual void SetSessionCode(const std::string& newSessionCode);
+
+		virtual void SetSessionCode(std::string&& newSessionCode);
+
+		virtual void ResetSessionCode();
+
 		virtual std::int64_t GetScore() const;
 
 		virtual void SetScore(std::int64_t newScore);
@@ -49,9 +57,11 @@ namespace WhackAStoodentServer
 
 		std::shared_ptr<Peer> peer;
 
-		uuids::uuid userID;
+		const uuids::uuid userID;
 
 		std::wstring name;
+
+		std::string sessionCode;
 
 		std::int64_t score;
 	};

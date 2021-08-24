@@ -19,7 +19,7 @@ endmacro()
 ##################
 
 conan_require_find_packages(
-	"enet/1.3.17"
+	#"enet/1.3.17"
 	"nlohmann_json/3.9.1"
 )
 
@@ -34,4 +34,7 @@ conan_cmake_autodetect(settings)
 conan_cmake_install(PATH_OR_REFERENCE "."
 	BUILD missing
 	REMOTE conan-center
-	SETTINGS ${settings})
+	SETTINGS ${settings}
+)
+
+add_subdirectory(enet)
