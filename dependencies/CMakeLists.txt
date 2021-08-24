@@ -4,6 +4,8 @@
 #              #
 ################
 
+add_subdirectory(enet)
+
 include("cmake-conan/conan.cmake")
 
 macro(conan_require_find_packages)
@@ -19,7 +21,6 @@ endmacro()
 ##################
 
 conan_require_find_packages(
-	#"enet/1.3.17"
 	"nlohmann_json/3.9.1"
 )
 
@@ -36,5 +37,3 @@ conan_cmake_install(PATH_OR_REFERENCE "."
 	REMOTE conan-center
 	SETTINGS ${settings}
 )
-
-add_subdirectory(enet)
