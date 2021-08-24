@@ -14,6 +14,7 @@
 
 #include <Abstract/ASerializableMessage.hpp>
 #include <Enumerators/EErrorType.hpp>
+#include <Misc/Bans.hpp>
 #include <Misc/Event.hpp>
 #include <Misc/Game.hpp>
 #include <Misc/Message.hpp>
@@ -25,6 +26,8 @@ namespace WhackAStoodentServer
 	class Server
 	{
 	public:
+
+		static constexpr const char* defaultBansPath = "./bans.txt";
 
 		Event<std::shared_ptr<Peer>> OnPeerConnectionAttempted;
 
@@ -68,6 +71,18 @@ namespace WhackAStoodentServer
 
 		virtual bool ProcessMessages();
 
+		/// <summary>
+		/// Gets bans
+		/// </summary>
+		/// <returns>Bans</returns>
+		virtual Bans& GetBans();
+
+		/// <summary>
+		/// Gets bans
+		/// </summary>
+		/// <returns>Bans</returns>
+		virtual const Bans& GetBans() const;
+
 		Server& operator=(const Server&) = delete;
 		Server& operator=(Server&&) = delete;
 
@@ -78,6 +93,8 @@ namespace WhackAStoodentServer
 		std::uint32_t timeoutTime;
 
 		ENetHost* enetHost;
+
+		Bans bans;
 
 		std::unordered_map<std::uint16_t, std::shared_ptr<Peer>> peers;
 

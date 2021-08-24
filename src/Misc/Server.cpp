@@ -55,7 +55,7 @@ WhackAStoodentServer::Server::Server(std::uint16_t port, std::uint32_t timeoutTi
 		{
 			uuids::uuid user_id(message.GetUserID());
 			std::wstring name(message.GetUsername());
-			if (users.contains(peer->GetIncomingID()))
+			if (users.contains(peer->GetIncomingPeerID()))
 			{
 				peer->SendPeerMessage<WhackAStoodentServer::Messages::ErrorMessage>(EErrorType::InvalidMessageContext, L"You are already authenticated.");
 			}
@@ -78,10 +78,7 @@ WhackAStoodentServer::Server::Server(std::uint16_t port, std::uint32_t timeoutTi
 					name = name.substr(static_cast<std::size_t>(0), WhackAStoodentServer::Rules::MaximalNameLength);
 				}
 				std::string session_code;
-				while (sessionCodeToUserIDLookup.contains(SessionCodes::CreateSessionCode(session_code)))
-				{
-					// ...
-				}
+				while (sessionCodeToUserIDLookup.contains(SessionCodes::CreateSessionCode(session_code)));
 				std::shared_ptr<WhackAStoodentServer::User> user(std::make_shared<WhackAStoodentServer::User>(peer, user_id, name, session_code, 0L));
 				sessionCodeToUserIDLookup.insert_or_assign(session_code, user);
 				user->OnConnected += [&, user]()
@@ -92,7 +89,7 @@ WhackAStoodentServer::Server::Server(std::uint16_t port, std::uint32_t timeoutTi
 				{
 					OnUserDisconnected(user);
 				};
-				users.insert_or_assign(peer->GetIncomingID(), user);
+				users.insert_or_assign(peer->GetIncomingPeerID(), user);
 				user->OnConnected();
 			}
 		},
@@ -348,6 +345,11 @@ WhackAStoodentServer::Server::~Server()
 bool WhackAStoodentServer::Server::Start()
 {
 	bool ret(false);
+	std::size_t ban_count(bans.LoadFromFile(defaultBansPath));
+	if (ban_count)
+	{
+		std::cout << "Successfully loaded " << ban_count << " " << ((ban_count == static_cast<std::size_t>(1)) ? "ban" : "bans") << " from \"" << defaultBansPath << "\"." << std::endl;
+	}
 	if (!enetHost)
 	{
 		ENetAddress enet_address;
@@ -370,6 +372,7 @@ void WhackAStoodentServer::Server::Stop()
 {
 	if (enetHost)
 	{
+		bans.SaveToFile(defaultBansPath);
 		for (auto& peer : peers)
 		{
 			peer.second->Disconnect(WhackAStoodentServer::EDisconnectionReason::Stopped);
@@ -419,8 +422,14 @@ bool WhackAStoodentServer::Server::ProcessMessages()
 							OnPeerDisconnected(peer);
 						};
 						peer->OnConnectionAttempted();
-						// TOOD: Check if peer is banned
-						peer->OnConnected();
+						if (bans.IsIPAddressBanned(peer->GetIPv4Address()))
+						{
+							peer->Disconnect(WhackAStoodentServer::EDisconnectionReason::Banned);
+						}
+						else
+						{
+							peer->OnConnected();
+						}
 					}
 					break;
 				case ENET_EVENT_TYPE_DISCONNECT:
@@ -488,6 +497,24 @@ bool WhackAStoodentServer::Server::ProcessMessages()
 	return ret;
 }
 
+/// <summary>
+/// Gets bans
+/// </summary>
+/// <returns>Bans</returns>
+WhackAStoodentServer::Bans& WhackAStoodentServer::Server::GetBans()
+{
+	return bans;
+}
+
+/// <summary>
+/// Gets bans
+/// </summary>
+/// <returns>Bans</returns>
+const WhackAStoodentServer::Bans& WhackAStoodentServer::Server::GetBans() const
+{
+	return bans;
+}
+
 void WhackAStoodentServer::Server::HandleMessageParseFailedEvent(std::shared_ptr<WhackAStoodentServer::Peer> peer, std::shared_ptr<WhackAStoodentServer::Message> message)
 {
 	peer->SendPeerMessage<Messages::ErrorMessage>(WhackAStoodentServer::EErrorType::MalformedMessage, L"Failed to parse message type \"" + std::to_wstring(static_cast<int>(message->GetMessageType())) + L"\"");
@@ -495,7 +522,7 @@ void WhackAStoodentServer::Server::HandleMessageParseFailedEvent(std::shared_ptr
 
 void WhackAStoodentServer::Server::AssertPeerIsAuthenticated(std::shared_ptr<WhackAStoodentServer::Peer> peer, std::function<void(std::shared_ptr<WhackAStoodentServer::User> user)> onPeerIsAuthenticated)
 {
-	auto user_iterator(users.find(peer->GetIncomingID()));
+	auto user_iterator(users.find(peer->GetIncomingPeerID()));
 	if (user_iterator == users.end())
 	{
 		peer->SendPeerMessage<Messages::ErrorMessage>(WhackAStoodentServer::EErrorType::InvalidMessageContext, L"You are not authenticated.");

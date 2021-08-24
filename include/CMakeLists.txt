@@ -53,6 +53,7 @@ target_sources(${WHACK_A_STOODENT_SERVER_PROJECT} PRIVATE
 	"${CMAKE_CURRENT_SOURCE_DIR}/Messages/ScoreMoleMessage.hpp"
 	
 	# Misc
+	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Bans.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Event.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Game.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Games.hpp"
