@@ -3,11 +3,27 @@
 #include <Misc/Games.hpp>
 #include <Static/SessionCodes.hpp>
 
-std::shared_ptr<WhackAStoodentServer::User> WhackAStoodentServer::Games::CreateUser(std::shared_ptr<WhackAStoodentServer::Peer> peer, const uuids::uuid& userID, const std::wstring& name)
+/// <summary>
+/// Constructs a set of games
+/// </summary>
+WhackAStoodentServer::Games::Games()
+{
+	// ...
+}
+
+/// <summary>
+/// Destroys set of games
+/// </summary>
+WhackAStoodentServer::Games::~Games()
+{
+	// ...
+}
+
+std::shared_ptr<WhackAStoodentServer::User> WhackAStoodentServer::Games::CreateUser(std::shared_ptr<WhackAStoodentServer::Peer> peer, const uuids::uuid& userID, std::wstring_view username)
 {
 	std::string session_code;
 	while (users.contains(SessionCodes::CreateSessionCode(session_code)));
-	std::shared_ptr<WhackAStoodentServer::User> ret(std::make_shared<WhackAStoodentServer::User>(peer, userID, name, session_code, 0L));
+	std::shared_ptr<WhackAStoodentServer::User> ret(std::make_shared<WhackAStoodentServer::User>(peer, userID, username, session_code, 0L));
 	users.insert_or_assign(session_code, ret);
 	return ret;
 }
@@ -18,7 +34,7 @@ bool WhackAStoodentServer::Games::RemoveUser(std::shared_ptr<WhackAStoodentServe
 	{
 		throw std::invalid_argument("Parameter \"user\" is null.");
 	}
-	bool ret(!!users.erase(user->GetSessionCode()));
+	bool ret(!!users.erase(std::string(user->GetSessionCode())));
 	if (ret)
 	{
 		availableUserIDs.erase(user->GetUserID());
@@ -31,7 +47,7 @@ bool WhackAStoodentServer::Games::RemoveUser(std::shared_ptr<WhackAStoodentServe
 
 bool WhackAStoodentServer::Games::AddUserToSearch(std::shared_ptr<WhackAStoodentServer::User> user)
 {
-	bool ret(users.contains(user->GetSessionCode()) && !searchingUserIDs.contains(user->GetUserID()));
+	bool ret(users.contains(std::string(user->GetSessionCode())) && !searchingUserIDs.contains(user->GetUserID()));
 	if (ret)
 	{
 		usersSearching.push_back(user);
@@ -42,7 +58,7 @@ bool WhackAStoodentServer::Games::AddUserToSearch(std::shared_ptr<WhackAStoodent
 
 bool WhackAStoodentServer::Games::RemoveUserFromSearch(std::shared_ptr<WhackAStoodentServer::User> user)
 {
-	bool ret(users.contains(user->GetSessionCode()) && searchingUserIDs.contains(user->GetUserID()));
+	bool ret(users.contains(std::string(user->GetSessionCode())) && searchingUserIDs.contains(user->GetUserID()));
 	if (ret)
 	{
 		usersSearching.remove(user);

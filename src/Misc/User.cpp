@@ -3,10 +3,18 @@
 #include <Misc/User.hpp>
 #include <Static/SessionCodes.hpp>
 
-WhackAStoodentServer::User::User(std::shared_ptr<Peer> peer, uuids::uuid userID, const std::wstring& name, const std::string& sessionCode, int64_t score) :
+/// <summary>
+/// Constructs a user
+/// </summary>
+/// <param name="peer">Peer</param>
+/// <param name="userID">User ID</param>
+/// <param name="username">Username</param>
+/// <param name="sessionCode">Session code</param>
+/// <param name="score">Score</param>
+WhackAStoodentServer::User::User(std::shared_ptr<Peer> peer, uuids::uuid userID, std::wstring_view username, std::string_view sessionCode, int64_t score) :
 	peer(peer),
 	userID(userID),
-	name(name),
+	username(username),
 	sessionCode(sessionCode),
 	score(score)
 {
@@ -16,42 +24,73 @@ WhackAStoodentServer::User::User(std::shared_ptr<Peer> peer, uuids::uuid userID,
 	}
 }
 
+/// <summary>
+/// Destroys user
+/// </summary>
 WhackAStoodentServer::User::~User()
 {
 	// ...
 }
 
+/// <summary>
+/// Gets the peer
+/// </summary>
+/// <returns>Peer</returns>
 const WhackAStoodentServer::Peer& WhackAStoodentServer::User::GetPeer() const
 {
 	return *peer;
 }
 
+/// <summary>
+/// Gets the peer
+/// </summary>
+/// <returns>Peer</returns>
 WhackAStoodentServer::Peer& WhackAStoodentServer::User::GetPeer()
 {
 	return *peer;
 }
 
+/// <summary>
+/// Gets the user ID
+/// </summary>
+/// <returns>User ID</returns>
 const uuids::uuid& WhackAStoodentServer::User::GetUserID() const
 {
 	return userID;
 }
 
-const std::wstring& WhackAStoodentServer::User::GetName() const
+/// <summary>
+/// Gets the username
+/// </summary>
+/// <returns>Username</returns>
+std::wstring_view WhackAStoodentServer::User::GetUsername() const
 {
-	return name;
+	return username;
 }
 
-void WhackAStoodentServer::User::SetName(const std::wstring& newName)
+/// <summary>
+/// Sets a new username
+/// </summary>
+/// <param name="newUsername">New username</param>
+void WhackAStoodentServer::User::SetUsername(std::wstring_view newUsername)
 {
-	name = newName;
+	username = newUsername;
 }
 
-const std::string& WhackAStoodentServer::User::GetSessionCode() const
+/// <summary>
+/// Gets the session code
+/// </summary>
+/// <returns>Session code</returns>
+std::string_view WhackAStoodentServer::User::GetSessionCode() const
 {
 	return sessionCode;
 }
 
-void WhackAStoodentServer::User::SetSessionCode(const std::string& newSessionCode)
+/// <summary>
+/// Sets a new session code
+/// </summary>
+/// <param name="newSessionCode">New session code</param>
+void WhackAStoodentServer::User::SetSessionCode(std::string_view newSessionCode)
 {
 	if (!SessionCodes::IsSessionCodeValid(newSessionCode))
 	{
@@ -60,25 +99,27 @@ void WhackAStoodentServer::User::SetSessionCode(const std::string& newSessionCod
 	sessionCode = newSessionCode;
 }
 
-void WhackAStoodentServer::User::SetSessionCode(std::string&& newSessionCode)
-{
-	if (!SessionCodes::IsSessionCodeValid(newSessionCode))
-	{
-		throw std::invalid_argument("Parameter \"newSessionCode\" is not valid.");
-	}
-	sessionCode = newSessionCode;
-}
-
+/// <summary>
+/// Resets session code
+/// </summary>
 void WhackAStoodentServer::User::ResetSessionCode()
 {
 	sessionCode.clear();
 }
 
+/// <summary>
+/// Gets the score
+/// </summary>
+/// <returns>Score</returns>
 std::int64_t WhackAStoodentServer::User::GetScore() const
 {
 	return score;
 }
 
+/// <summary>
+/// Sets a new score
+/// </summary>
+/// <param name="newScore">New score</param>
 void WhackAStoodentServer::User::SetScore(std::int64_t newScore)
 {
 	score = newScore;

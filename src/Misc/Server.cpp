@@ -27,17 +27,23 @@
 #include <Misc/MessageParser.hpp>
 #include <Misc/Server.hpp>
 #include <Static/ENetInitializer.hpp>
+#include <Static/Defaults.hpp>
 #include <Static/Rules.hpp>
 #include <Static/SessionCodes.hpp>
 #include <Static/UUIDs.hpp>
 
+/// <summary>
+/// Constructs a server
+/// </summary>
+/// <param name="port">Network port</param>
+/// <param name="timeoutTime">Timeout time</param>
 WhackAStoodentServer::Server::Server(std::uint16_t port, std::uint32_t timeoutTime) : port(port), timeoutTime(timeoutTime), enetHost(nullptr)
 {
 	if (!port)
 	{
-		throw InvalidNetworkPortException(port);
+		throw WhackAStoodentServer::InvalidNetworkPortException(port);
 	}
-	ENetInitializer::Initialize();
+	WhackAStoodentServer::ENetInitializer::Initialize();
 	AddMessageParser<WhackAStoodentServer::Messages::ErrorMessage>
 	(
 		[](std::shared_ptr<WhackAStoodentServer::Peer> peer, const WhackAStoodentServer::Messages::ErrorMessage& message)
@@ -78,7 +84,7 @@ WhackAStoodentServer::Server::Server(std::uint16_t port, std::uint32_t timeoutTi
 					name = name.substr(static_cast<std::size_t>(0), WhackAStoodentServer::Rules::MaximalNameLength);
 				}
 				std::string session_code;
-				while (sessionCodeToUserIDLookup.contains(SessionCodes::CreateSessionCode(session_code)));
+				while (sessionCodeToUserIDLookup.contains(WhackAStoodentServer::SessionCodes::CreateSessionCode(session_code)));
 				std::shared_ptr<WhackAStoodentServer::User> user(std::make_shared<WhackAStoodentServer::User>(peer, user_id, name, session_code, 0L));
 				sessionCodeToUserIDLookup.insert_or_assign(session_code, user);
 				user->OnConnected += [&, user]()
@@ -191,7 +197,7 @@ WhackAStoodentServer::Server::Server(std::uint16_t port, std::uint32_t timeoutTi
 					}
 					else
 					{
-						auto session_code_to_user_id_lookup_iterator(sessionCodeToUserIDLookup.find(currentMessage.GetSessionCode()));
+						auto session_code_to_user_id_lookup_iterator(sessionCodeToUserIDLookup.find(std::string(currentMessage.GetSessionCode())));
 						if (session_code_to_user_id_lookup_iterator == sessionCodeToUserIDLookup.end())
 						{
 							// TODO: Error
@@ -337,18 +343,25 @@ WhackAStoodentServer::Server::Server(std::uint16_t port, std::uint32_t timeoutTi
 	);
 }
 
+/// <summary>
+/// Destroys server
+/// </summary>
 WhackAStoodentServer::Server::~Server()
 {
 	WhackAStoodentServer::ENetInitializer::Deinitialize();
 }
 
+/// <summary>
+/// Starts this server
+/// </summary>
+/// <returns>"true" if starting server was successful, otherwise "false"</returns>
 bool WhackAStoodentServer::Server::Start()
 {
 	bool ret(false);
-	std::size_t ban_count(bans.LoadFromFile(defaultBansPath));
+	std::size_t ban_count(bans.LoadFromFile(WhackAStoodentServer::Defaults::BansFilePath));
 	if (ban_count)
 	{
-		std::cout << "Successfully loaded " << ban_count << " " << ((ban_count == static_cast<std::size_t>(1)) ? "ban" : "bans") << " from \"" << defaultBansPath << "\"." << std::endl;
+		std::cout << "Successfully loaded " << ban_count << " " << ((ban_count == static_cast<std::size_t>(1)) ? "ban" : "bans") << " from \"" << WhackAStoodentServer::Defaults::BansFilePath << "\"." << std::endl;
 	}
 	if (!enetHost)
 	{
@@ -368,11 +381,14 @@ bool WhackAStoodentServer::Server::Start()
 	return ret;
 }
 
+/// <summary>
+/// Stops this server
+/// </summary>
 void WhackAStoodentServer::Server::Stop()
 {
 	if (enetHost)
 	{
-		bans.SaveToFile(defaultBansPath);
+		bans.SaveToFile(WhackAStoodentServer::Defaults::BansFilePath);
 		for (auto& peer : peers)
 		{
 			peer.second->Disconnect(WhackAStoodentServer::EDisconnectionReason::Stopped);
@@ -382,11 +398,19 @@ void WhackAStoodentServer::Server::Stop()
 	}
 }
 
+/// <summary>
+/// Is this server running
+/// </summary>
+/// <returns>"true" if this server is running, otherwise "false"</returns>
 bool WhackAStoodentServer::Server::IsRunning() const
 {
 	return !!enetHost;
 }
 
+/// <summary>
+/// Processes messages
+/// </summary>
+/// <returns>"true" if server is still running, otherwise "false"</returns>
 bool WhackAStoodentServer::Server::ProcessMessages()
 {
 	bool ret(false);
@@ -457,7 +481,7 @@ bool WhackAStoodentServer::Server::ProcessMessages()
 							try
 							{
 								std::shared_ptr<WhackAStoodentServer::Peer> peer(peers_iterator->second);
-								std::shared_ptr<WhackAStoodentServer::Message> message(std::make_shared<WhackAStoodentServer::Message>(enet_event.packet->data, enet_event.packet->dataLength));
+								std::shared_ptr<WhackAStoodentServer::Message> message(std::make_shared<WhackAStoodentServer::Message>(std::span<const std::uint8_t>(enet_event.packet->data, enet_event.packet->dataLength)));
 								WhackAStoodentServer::EMessageType message_type(message->GetMessageType());
 								auto message_parser_list_iterator(messageParserLists.find(message_type));
 								if (message_parser_list_iterator == messageParserLists.end())
@@ -515,11 +539,21 @@ const WhackAStoodentServer::Bans& WhackAStoodentServer::Server::GetBans() const
 	return bans;
 }
 
+/// <summary>
+/// Handles message parse failed event
+/// </summary>
+/// <param name="peer">Peer</param>
+/// <param name="message">Message</param>
 void WhackAStoodentServer::Server::HandleMessageParseFailedEvent(std::shared_ptr<WhackAStoodentServer::Peer> peer, std::shared_ptr<WhackAStoodentServer::Message> message)
 {
 	peer->SendPeerMessage<Messages::ErrorMessage>(WhackAStoodentServer::EErrorType::MalformedMessage, L"Failed to parse message type \"" + std::to_wstring(static_cast<int>(message->GetMessageType())) + L"\"");
 }
 
+/// <summary>
+/// Asserts that peer is authenticated
+/// </summary>
+/// <param name="peer">Peer</param>
+/// <param name="onPeerIsAuthenticated">USed to invoke when peer is authenticated</param>
 void WhackAStoodentServer::Server::AssertPeerIsAuthenticated(std::shared_ptr<WhackAStoodentServer::Peer> peer, std::function<void(std::shared_ptr<WhackAStoodentServer::User> user)> onPeerIsAuthenticated)
 {
 	auto user_iterator(users.find(peer->GetIncomingPeerID()));
@@ -533,6 +567,11 @@ void WhackAStoodentServer::Server::AssertPeerIsAuthenticated(std::shared_ptr<Wha
 	}
 }
 
+/// <summary>
+/// Asserts that peer is in game
+/// </summary>
+/// <param name="peer">Peer</param>
+/// <param name="onPeerIsInGame">Used to invoke when peer in in game</param>
 void WhackAStoodentServer::Server::AssertPeerIsInGame(std::shared_ptr<WhackAStoodentServer::Peer> peer, std::function<void(std::shared_ptr<WhackAStoodentServer::User> user, std::shared_ptr<WhackAStoodentServer::Game> game)> onPeerIsInGame)
 {
 	AssertPeerIsAuthenticated

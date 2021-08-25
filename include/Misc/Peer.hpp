@@ -54,7 +54,7 @@ namespace WhackAStoodentServer
 		/// <summary>
 		/// Gets invoked when an error has been received
 		/// </summary>
-		Event<EErrorType, const std::wstring&> OnErrorReceived;
+		Event<EErrorType, std::wstring_view> OnErrorReceived;
 
 		Peer() = delete;
 		Peer(const Peer&) = delete;
@@ -67,7 +67,7 @@ namespace WhackAStoodentServer
 		Peer(ENetPeer* peer);
 
 		/// <summary>
-		/// Destructs peer
+		/// Destroys peer
 		/// </summary>
 		virtual ~Peer();
 

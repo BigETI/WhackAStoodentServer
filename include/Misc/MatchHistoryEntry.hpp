@@ -2,49 +2,125 @@
 
 #include <cstdint>
 #include <string>
+#include <string_view>
 
 #include <Interfaces/ISerializable.hpp>
 
+/// <summary>
+/// Whack-A-Stoodent server namespace
+/// </summary>
 namespace WhackAStoodentServer
 {
+	/// <summary>
+	/// A class that describes a match history entry
+	/// </summary>
 	class MatchHistoryEntry : ISerializable
 	{
 	public:
 
+		/// <summary>
+		/// Constructs a match history entry
+		/// </summary>
 		MatchHistoryEntry();
 
+		/// <summary>
+		/// Constructs a match history entry
+		/// </summary>
+		/// <param name="matchHistoryEntry">Match history entry</param>
 		MatchHistoryEntry(const MatchHistoryEntry& matchHistoryEntry);
 
+		/// <summary>
+		/// Constructs a match history entry
+		/// </summary>
+		/// <param name="matchHistoryEntry">Match history entry</param>
 		MatchHistoryEntry(MatchHistoryEntry&& matchHistoryEntry);
 
-		MatchHistoryEntry(std::int64_t yourScore, std::wstring yourName, std::int64_t opponentScore, std::wstring opponentName);
+		/// <summary>
+		/// Constructs a match history entry
+		/// </summary>
+		/// <param name="yourScore">Your score</param>
+		/// <param name="yourName">Your name</param>
+		/// <param name="opponentScore">Opponent's name</param>
+		/// <param name="opponentName">Opponent's name</param>
+		MatchHistoryEntry(std::int64_t yourScore, std::wstring_view yourName, std::int64_t opponentScore, std::wstring_view opponentName);
 
+		/// <summary>
+		/// Destroys match history entry
+		/// </summary>
 		virtual ~MatchHistoryEntry();
 
+		/// <summary>
+		/// Gets your score
+		/// </summary>
+		/// <returns>Your score</returns>
 		virtual std::int64_t GetYourScore() const;
 
-		virtual const std::wstring& GetYourName() const;
+		/// <summary>
+		/// Gets your name
+		/// </summary>
+		/// <returns>Your name</returns>
+		virtual std::wstring_view GetYourName() const;
 
+		/// <summary>
+		/// Gets the opponent's score
+		/// </summary>
+		/// <returns>Opponent's score</returns>
 		virtual std::int64_t GetOpponentScore() const;
 
-		virtual const std::wstring& GetOpponentName() const;
+		/// <summary>
+		/// Gets the opponent's name
+		/// </summary>
+		/// <returns>Opponent's name</returns>
+		virtual std::wstring_view GetOpponentName() const;
 
+		/// <summary>
+		/// Serializes contents
+		/// </summary>
+		/// <param name="result">Result</param>
+		/// <returns>Serialized contents</returns>
 		virtual std::vector<std::uint8_t>& Serialize(std::vector<std::uint8_t>& result) const override;
 
+		/// <summary>
+		/// Deserializes given input
+		/// </summary>
+		/// <param name="data">Data to deserialize</param>
+		/// <returns>Remaining data to deserialize</returns>
 		virtual std::span<std::uint8_t const> Deserialize(const std::span<std::uint8_t const>& data) override;
 
+		/// <summary>
+		/// Assigns a match history entry to this object
+		/// </summary>
+		/// <param name="matchHistoryEntry">Match history entry</param>
+		/// <returns>This object</returns>
 		virtual MatchHistoryEntry& operator=(const MatchHistoryEntry& matchHistoryEntry);
 
+		/// <summary>
+		/// Assigns a match history entry to this object
+		/// </summary>
+		/// <param name="matchHistoryEntry">Match history entry</param>
+		/// <returns>This object</returns>
 		virtual MatchHistoryEntry& operator=(MatchHistoryEntry&& matchHistoryEntry) noexcept;
 
 	private:
 
+		/// <summary>
+		/// Your score
+		/// </summary>
 		std::int64_t yourScore;
 
+		/// <summary>
+		/// Your name
+		/// </summary>
 		std::wstring yourName;
 
+		/// <summary>
+		/// Opponent's score
+		/// </summary>
 		std::int64_t opponentScore;
 
+		/// <summary>
+		/// Opponent's name
+		/// </summary>
 		std::wstring opponentName;
 	};
 }

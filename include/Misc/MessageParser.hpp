@@ -10,8 +10,15 @@
 #include <Misc/Message.hpp>
 #include <Misc/Peer.hpp>
 
+/// <summary>
+/// Whack-A-Stoodent server namespace
+/// </summary>
 namespace WhackAStoodentServer
 {
+	/// <summary>
+	/// A class that describes a message parser
+	/// </summary>
+	/// <typeparam name="T">Message type</typeparam>
 	template <typename T>
 	class MessageParser : public IMessageParser
 	{
@@ -19,12 +26,20 @@ namespace WhackAStoodentServer
 
 		static_assert(std::is_base_of<ISerializableMessage, T>::value);
 
+		/// <summary>
+		/// Message type
+		/// </summary>
 		using MessageType = T;
 
 		MessageParser() = delete;
 		MessageParser(const MessageParser<T>&) = delete;
 		MessageParser(MessageParser<T>&&) = delete;
 
+		/// <summary>
+		/// Constructs a new message parser
+		/// </summary>
+		/// <param name="onPeerMessageParsed">Used to invoke when peer message has been succesfully parsed</param>
+		/// <param name="onPeerMessageParseFailed">Used to invoke when parsing peer message has failed</param>
 		MessageParser(std::function<void(std::shared_ptr<Peer> peer, const T& message)> onPeerMessageParsed, std::function<void(std::shared_ptr<Peer> peer, std::shared_ptr<Message> message)> onPeerMessageParseFailed) :
 			onPeerMessageParsed(onPeerMessageParsed),
 			onPeerMessageParseFailed(onPeerMessageParseFailed)
@@ -35,11 +50,19 @@ namespace WhackAStoodentServer
 			}
 		}
 
+		/// <summary>
+		/// Destroys message parser
+		/// </summary>
 		virtual ~MessageParser()
 		{
 			// ...
 		}
 
+		/// <summary>
+		/// Parses peer message
+		/// </summary>
+		/// <param name="peer">Peer</param>
+		/// <param name="message">Message</param>
 		virtual void ParsePeerMessage(std::shared_ptr<Peer> peer, std::shared_ptr<Message> message) override
 		{
 			if (!peer)
@@ -73,8 +96,14 @@ namespace WhackAStoodentServer
 
 	private:
 
+		/// <summary>
+		/// Used to invoke when peer message has been succesfully parsed
+		/// </summary>
 		std::function<void(std::shared_ptr<Peer> peer, const T& message)> onPeerMessageParsed;
 
+		/// <summary>
+		/// Used to invoke when parsing peer message has failed
+		/// </summary>
 		std::function<void(std::shared_ptr<Peer> peer, std::shared_ptr<Message> message)> onPeerMessageParseFailed;
 	};
 }

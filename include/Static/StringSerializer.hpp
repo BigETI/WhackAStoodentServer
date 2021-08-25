@@ -8,6 +8,9 @@
 #include <Exceptions/DeserializationFailedException.hpp>
 #include <Static/NumericSerializer.hpp>
 
+/// <summary>
+/// Whack-A-Stoodent server namespace
+/// </summary>
 namespace WhackAStoodentServer
 {
 	class StringSerializer

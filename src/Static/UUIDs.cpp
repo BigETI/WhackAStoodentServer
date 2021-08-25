@@ -4,6 +4,11 @@
 #include <Exceptions/DeserializationFailedException.hpp>
 #include <Static/UUIDs.hpp>
 
+/// <summary>
+/// Creates a new UUID
+/// </summary>
+/// <param name="result">Result</param>
+/// <returns>New UUID</returns>
 uuids::uuid& WhackAStoodentServer::UUIDs::CreateNewUUID(uuids::uuid& result)
 {
 	std::random_device random_device;
@@ -14,6 +19,12 @@ uuids::uuid& WhackAStoodentServer::UUIDs::CreateNewUUID(uuids::uuid& result)
 	return result = uuids::uuid_random_generator{ generator }();
 }
 
+/// <summary>
+/// Serializes UUID
+/// </summary>
+/// <param name="uuid">UUID</param>
+/// <param name="result">Result</param>
+/// <returns>Serialized UUID</returns>
 std::vector<std::uint8_t>& WhackAStoodentServer::UUIDs::SerializeUUID(const uuids::uuid& uuid, std::vector<std::uint8_t>& result)
 {
 	std::size_t offset(result.size());
@@ -22,6 +33,12 @@ std::vector<std::uint8_t>& WhackAStoodentServer::UUIDs::SerializeUUID(const uuid
 	return result;
 }
 
+/// <summary>
+/// Deserializes UUID from data
+/// </summary>
+/// <param name="bytes">Data</param>
+/// <param name="result">Result</param>
+/// <returns>Remaining data to be deserialized</returns>
 std::span<std::uint8_t const> WhackAStoodentServer::UUIDs::DeserializeUUID(const std::span<std::uint8_t const>& bytes, uuids::uuid& result)
 {
 	if (bytes.size() < DataSize)

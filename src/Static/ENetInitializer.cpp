@@ -3,8 +3,14 @@
 #include <Exceptions/ENetInitializationFailedException.hpp>
 #include <Static/ENetInitializer.hpp>
 
+/// <summary>
+/// Initialization count
+/// </summary>
 std::size_t WhackAStoodentServer::ENetInitializer::initializationCount(static_cast<std::size_t>(0));
 
+/// <summary>
+/// Initializes ENet
+/// </summary>
 void WhackAStoodentServer::ENetInitializer::Initialize()
 {
 	if (initializationCount == static_cast<std::size_t>(0))
@@ -17,6 +23,10 @@ void WhackAStoodentServer::ENetInitializer::Initialize()
 	}
 }
 
+/// <summary>
+/// Deinitializes ENet
+/// </summary>
+/// <returns>"true" if ENet has been successfull deinitialized, otherwise "false"</returns>
 bool WhackAStoodentServer::ENetInitializer::Deinitialize()
 {
 	bool ret(initializationCount > static_cast<std::size_t>(0));
@@ -31,6 +41,10 @@ bool WhackAStoodentServer::ENetInitializer::Deinitialize()
 	return ret;
 }
 
+/// <summary>
+/// Get the initialization count
+/// </summary>
+/// <returns>Initialization count</returns>
 std::size_t WhackAStoodentServer::ENetInitializer::GetInitializationCount()
 {
 	return initializationCount;

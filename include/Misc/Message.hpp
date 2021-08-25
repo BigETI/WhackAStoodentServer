@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <span>
 #include <memory>
 #include <vector>
 
@@ -9,8 +10,14 @@
 #include <Exceptions/DeserializationFailedException.hpp>
 #include <Interfaces/ISerializableMessage.hpp>
 
+/// <summary>
+/// Whack-A-Stoodent server namespace
+/// </summary>
 namespace WhackAStoodentServer
 {
+	/// <summary>
+	/// A class that describes a message
+	/// </summary>
 	class Message
 	{
 	public:
@@ -19,16 +26,30 @@ namespace WhackAStoodentServer
 		Message(const Message&) = delete;
 		Message(Message&&) = delete;
 
-		Message(const std::vector<std::uint8_t>& data);
+		/// <summary>
+		/// Constructs a message
+		/// </summary>
+		/// <param name="data">Message data</param>
+		Message(const std::span<const std::uint8_t> data);
 
-		Message(std::uint8_t *data, std::size_t size);
-
+		/// <summary>
+		/// Gets the message type
+		/// </summary>
+		/// <returns>Message type</returns>
 		EMessageType GetMessageType() const;
 
-		std::vector<std::uint8_t>& GetData(std::vector<std::uint8_t>& result) const;
+		/// <summary>
+		/// Gets message data
+		/// </summary>
+		/// <returns>Message data</returns>
+		const std::span<std::uint8_t const> GetData() const;
 
-		std::size_t GetDataSize() const;
-
+		/// <summary>
+		/// Tries to get data
+		/// </summary>
+		/// <typeparam name="T">Message type</typeparam>
+		/// <param name="result">Result</param>
+		/// <returns>"true" if getting message data was successful, otherwise "false"</returns>
 		template <typename T>
 		bool TryGetData(T& result) const
 		{
@@ -36,8 +57,7 @@ namespace WhackAStoodentServer
 			bool ret(true);
 			try
 			{
-				std::vector<std::uint8_t> data;
-				result.Deserialize(GetData(data));
+				result.Deserialize(data);
 			}
 			catch (const DeserializationFailedException& e)
 			{
@@ -49,6 +69,9 @@ namespace WhackAStoodentServer
 
 	private:
 
+		/// <summary>
+		/// Message data
+		/// </summary>
 		std::vector<std::uint8_t> data;
 	};
 }

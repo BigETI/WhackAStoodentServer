@@ -5,8 +5,15 @@
 #include <Interfaces/ISerializable.hpp>
 #include <Static/NumericSerializer.hpp>
 
+/// <summary>
+/// Whack-A-Stoodent server namespace
+/// </summary>
 namespace WhackAStoodentServer
 {
+	/// <summary>
+	/// A class that describes a 2D vector
+	/// </summary>
+	/// <typeparam name="T">Vector component type</typeparam>
 	template <typename T>
 	class Vector2D : ISerializable
 	{
@@ -14,8 +21,14 @@ namespace WhackAStoodentServer
 
 		static_assert(std::is_same<float, T>::value || std::is_same<double, T>::value);
 
+		/// <summary>
+		/// Value type
+		/// </summary>
 		using ValueType = T;
 
+		/// <summary>
+		/// Constructs a new 2D vector
+		/// </summary>
 		Vector2D() :
 			x(0.0f),
 			y(0.0f)
@@ -23,6 +36,10 @@ namespace WhackAStoodentServer
 			// ...
 		}
 
+		/// <summary>
+		/// Constructs a new 2D vector
+		/// </summary>
+		/// <param name="vector2D">2D vector</param>
 		Vector2D(const Vector2D<T>& vector2D) :
 			x(vector2D.x),
 			y(vector2D.y)
@@ -30,6 +47,10 @@ namespace WhackAStoodentServer
 			// ...
 		}
 
+		/// <summary>
+		/// Constructs a new 2D vector
+		/// </summary>
+		/// <param name="vector2D">2D vector</param>
 		Vector2D(Vector2D<T>&& vector2D) :
 			x(vector2D.x),
 			y(vector2D.y)
@@ -37,6 +58,11 @@ namespace WhackAStoodentServer
 			// ...
 		}
 
+		/// <summary>
+		/// Constructs a new 2D vector
+		/// </summary>
+		/// <param name="x">X component</param>
+		/// <param name="y">Y component</param>
 		Vector2D(T x, T y) :
 			x(x),
 			y(y)
@@ -44,21 +70,37 @@ namespace WhackAStoodentServer
 			// ...
 		}
 
+		/// <summary>
+		/// Destroys 2D vector
+		/// </summary>
 		virtual ~Vector2D()
 		{
 			// ...
 		}
 
+		/// <summary>
+		/// Gets the X component
+		/// </summary>
+		/// <returns>X component</returns>
 		virtual inline T GetX() const
 		{
 			return x;
 		}
 
+		/// <summary>
+		/// Gets the Y component
+		/// </summary>
+		/// <returns>Y component</returns>
 		virtual inline T GetY() const
 		{
 			return y;
 		}
 
+		/// <summary>
+		/// Assigns a 2D vector to this object
+		/// </summary>
+		/// <param name="vector2D">2D vector</param>
+		/// <returns>This object</returns>
 		virtual Vector2D& operator=(const Vector2D<T>& vector2D)
 		{
 			x = vector2D.x;
@@ -66,6 +108,11 @@ namespace WhackAStoodentServer
 			return *this;
 		}
 
+		/// <summary>
+		/// Assigns a 2D vector to this object
+		/// </summary>
+		/// <param name="vector2D">2D vector</param>
+		/// <returns>This object</returns>
 		virtual Vector2D& operator=(Vector2D<T>&& vector2D) noexcept
 		{
 			x = vector2D.x;
@@ -73,12 +120,22 @@ namespace WhackAStoodentServer
 			return *this;
 		}
 
+		/// <summary>
+		/// Serializes contents
+		/// </summary>
+		/// <param name="result">Result</param>
+		/// <returns>Serialized contents</returns>
 		virtual std::vector<std::uint8_t>& Serialize(std::vector<std::uint8_t>& result) const override
 		{
 			NumericSerializer::Serialize<T>(x, result);
 			return NumericSerializer::Serialize<T>(y, result);
 		}
 
+		/// <summary>
+		/// Deserializes given input
+		/// </summary>
+		/// <param name="data">Data to deserialize</param>
+		/// <returns>Remaining data to deserialize</returns>
 		virtual std::span<std::uint8_t const> Deserialize(const std::span<std::uint8_t const>& data) override
 		{
 			std::span<std::uint8_t const> next_bytes(NumericSerializer::Deserialize<T>(data, x));
@@ -87,8 +144,14 @@ namespace WhackAStoodentServer
 
 	private:
 
+		/// <summary>
+		/// X component
+		/// </summary>
 		T x;
 
+		/// <summary>
+		/// Y component
+		/// </summary>
 		T y;
 	};
 }

@@ -18,7 +18,7 @@ WhackAStoodentServer::Peer::Peer(ENetPeer* peer) : peer(peer)
 }
 
 /// <summary>
-/// Destructs peer
+/// Destroys peer
 /// </summary>
 WhackAStoodentServer::Peer::~Peer()
 {
@@ -84,7 +84,7 @@ void WhackAStoodentServer::Peer::Disconnect(WhackAStoodentServer::EDisconnection
 	enet_uint32 data(static_cast<enet_uint32>(reason));
 	switch (reason)
 	{
-	case EDisconnectionReason::None:
+	case EDisconnectionReason::NoReason:
 		enet_peer_disconnect(peer, data);
 		break;
 	case EDisconnectionReason::Kicked:

@@ -2,15 +2,27 @@
 
 #include <cstddef>
 
+/// <summary>
+/// Whack-A-Stoodent server namespace
+/// </summary>
 namespace WhackAStoodentServer
 {
+	/// <summary>
+	/// A class that describes a set of rules
+	/// </summary>
 	class Rules
 	{
 	public:
 
-		static constexpr std::size_t MaximalNameLength = static_cast<std::size_t>(24);
+		/// <summary>
+		/// Maximal name length
+		/// </summary>
+		static constexpr const std::size_t MaximalNameLength = static_cast<const std::size_t>(24);
 
-		static constexpr std::size_t SessionCodeCharacterCount = static_cast<std::size_t>(6);
+		/// <summary>
+		/// Session code character count
+		/// </summary>
+		static constexpr const std::size_t SessionCodeCharacterCount = static_cast<const std::size_t>(6);
 
 		Rules() = delete;
 		Rules(const Rules&) = delete;

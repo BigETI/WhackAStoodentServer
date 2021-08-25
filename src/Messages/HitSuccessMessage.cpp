@@ -1,6 +1,9 @@
 #include <Messages/HitSuccessMessage.hpp>
 #include <Static/NumericSerializer.hpp>
 
+/// <summary>
+/// Constructs a hit message
+/// </summary>
 WhackAStoodentServer::Messages::HitSuccessMessage::HitSuccessMessage() :
 	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::HitSuccess>(),
 	lookHole(WhackAStoodentServer::ELookHole::Top),
@@ -10,6 +13,12 @@ WhackAStoodentServer::Messages::HitSuccessMessage::HitSuccessMessage() :
 	// ...
 }
 
+/// <summary>
+/// Constructs a hit message
+/// </summary>
+/// <param name="lookHole">Look hole</param>
+/// <param name="points">Points</param>
+/// <param name="position">Position</param>
 WhackAStoodentServer::Messages::HitSuccessMessage::HitSuccessMessage(WhackAStoodentServer::ELookHole lookHole, std::int64_t points, const WhackAStoodentServer::Vector2D<float>& position) :
 	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::HitSuccess>(),
 	lookHole(lookHole),
@@ -19,26 +28,46 @@ WhackAStoodentServer::Messages::HitSuccessMessage::HitSuccessMessage(WhackAStood
 	// ...
 }
 
+/// <summary>
+/// Destroys hit message
+/// </summary>
 WhackAStoodentServer::Messages::HitSuccessMessage::~HitSuccessMessage()
 {
 	// ...
 }
 
+/// <summary>
+/// Get the look hole
+/// </summary>
+/// <returns>Look hole</returns>
 WhackAStoodentServer::ELookHole WhackAStoodentServer::Messages::HitSuccessMessage::GetLookHole() const
 {
 	return lookHole;
 }
 
+/// <summary>
+/// Gets the points
+/// </summary>
+/// <returns>Points</returns>
 std::int64_t WhackAStoodentServer::Messages::HitSuccessMessage::GetPoints() const
 {
 	return points;
 }
 
+/// <summary>
+/// Gets the position
+/// </summary>
+/// <returns>Position</returns>
 const WhackAStoodentServer::Vector2D<float>& WhackAStoodentServer::Messages::HitSuccessMessage::GetPosition() const
 {
 	return position;
 }
 
+/// <summary>
+/// Serializes contents
+/// </summary>
+/// <param name="result">Result</param>
+/// <returns>Serialized contents</returns>
 std::vector<std::uint8_t>& WhackAStoodentServer::Messages::HitSuccessMessage::Serialize(std::vector<std::uint8_t>& result) const
 {
 	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::HitSuccess>::Serialize(result);
@@ -47,6 +76,11 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::HitSuccessMessage::Se
 	return position.Serialize(result);
 }
 
+/// <summary>
+/// Deserializes given input
+/// </summary>
+/// <param name="data">Data to deserialize</param>
+/// <returns>Remaining data to deserialize</returns>
 std::span<std::uint8_t const> WhackAStoodentServer::Messages::HitSuccessMessage::Deserialize(const std::span<std::uint8_t const>& data)
 {
 	std::uint8_t look_hole_index;

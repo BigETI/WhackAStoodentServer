@@ -2,6 +2,9 @@
 #include <Static/NumericSerializer.hpp>
 #include <Static/StringSerializer.hpp>
 
+/// <summary>
+/// Constructs a request play message
+/// </summary>
 WhackAStoodentServer::Messages::RequestPlayMessage::RequestPlayMessage() :
 	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::RequestPlay>(),
 	playerRole(EPlayerRole::Hitter)
@@ -9,7 +12,12 @@ WhackAStoodentServer::Messages::RequestPlayMessage::RequestPlayMessage() :
 	// ...
 }
 
-WhackAStoodentServer::Messages::RequestPlayMessage::RequestPlayMessage(WhackAStoodentServer::EPlayerRole playerRole, const std::wstring& opponentName) :
+/// <summary>
+/// Constructs a request play message
+/// </summary>
+/// <param name="playerRole">Player role</param>
+/// <param name="opponentName">Opponent name</param>
+WhackAStoodentServer::Messages::RequestPlayMessage::RequestPlayMessage(WhackAStoodentServer::EPlayerRole playerRole, std::wstring_view opponentName) :
 	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::RequestPlay>(),
 	playerRole(playerRole),
 	opponentName(opponentName)
@@ -17,21 +25,37 @@ WhackAStoodentServer::Messages::RequestPlayMessage::RequestPlayMessage(WhackASto
 	// ...
 }
 
+/// <summary>
+/// Destroys request play message
+/// </summary>
 WhackAStoodentServer::Messages::RequestPlayMessage::~RequestPlayMessage()
 {
 	// ...
 }
 
+/// <summary>
+/// Gets the player role
+/// </summary>
+/// <returns>Player role</returns>
 WhackAStoodentServer::EPlayerRole WhackAStoodentServer::Messages::RequestPlayMessage::GetPlayerRole() const
 {
 	return playerRole;
 }
 
-const std::wstring& WhackAStoodentServer::Messages::RequestPlayMessage::GetOpponentName() const
+/// <summary>
+/// Gets the opponent's name
+/// </summary>
+/// <returns>Opponent's name</returns>
+std::wstring_view WhackAStoodentServer::Messages::RequestPlayMessage::GetOpponentName() const
 {
 	return opponentName;
 }
 
+/// <summary>
+/// Serializes contents
+/// </summary>
+/// <param name="result">Result</param>
+/// <returns>Serialized contents</returns>
 std::vector<std::uint8_t>& WhackAStoodentServer::Messages::RequestPlayMessage::Serialize(std::vector<std::uint8_t>& result) const
 {
 	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::RequestPlay>::Serialize(result);
@@ -39,6 +63,11 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::RequestPlayMessage::S
 	return StringSerializer::SerializeByteSizedString(opponentName, result);
 }
 
+/// <summary>
+/// Deserializes given input
+/// </summary>
+/// <param name="data">Data to deserialize</param>
+/// <returns>Remaining data to deserialize</returns>
 std::span<std::uint8_t const> WhackAStoodentServer::Messages::RequestPlayMessage::Deserialize(const std::span<std::uint8_t const>& data)
 {
 	std::uint8_t player_role_index;

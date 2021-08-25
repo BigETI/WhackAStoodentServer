@@ -22,7 +22,7 @@ namespace WhackAStoodentServer
 		Bans();
 
 		/// <summary>
-		/// Destructs bans
+		/// Destroys bans
 		/// </summary>
 		virtual ~Bans();
 

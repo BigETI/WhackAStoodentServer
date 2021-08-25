@@ -12,7 +12,7 @@ WhackAStoodentServer::Bans::Bans()
 }
 
 /// <summary>
-/// Destructs bans
+/// Destroys bans
 /// </summary>
 WhackAStoodentServer::Bans::~Bans()
 {

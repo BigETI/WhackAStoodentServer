@@ -2,7 +2,11 @@
 
 #include <Misc/Message.hpp>
 
-WhackAStoodentServer::Message::Message(const std::vector<std::uint8_t>& data) : data(data)
+/// <summary>
+/// Constructs a message
+/// </summary>
+/// <param name="data">Message data</param>
+WhackAStoodentServer::Message::Message(const std::span<const std::uint8_t> data) : data(data.begin(), data.end())
 {
 	if (data.size() < static_cast<std::size_t>(1))
 	{
@@ -10,35 +14,20 @@ WhackAStoodentServer::Message::Message(const std::vector<std::uint8_t>& data) : 
 	}
 }
 
-WhackAStoodentServer::Message::Message(std::uint8_t* data, std::size_t size) : data(data, data + size)
-{
-	if (!data)
-	{
-		throw std::invalid_argument("Parameter \"data\" is null.");
-	}
-	if (size < static_cast<std::size_t>(1))
-	{
-		throw std::invalid_argument("Parameter \"size\" is smaller than one.");
-	}
-}
-
+/// <summary>
+/// Gets the message type
+/// </summary>
+/// <returns>Message type</returns>
 WhackAStoodentServer::EMessageType WhackAStoodentServer::Message::GetMessageType() const
 {
 	return static_cast<WhackAStoodentServer::EMessageType>(data[0]);
 }
 
-std::vector<std::uint8_t>& WhackAStoodentServer::Message::GetData(std::vector<std::uint8_t>& result) const
+/// <summary>
+/// Gets message data
+/// </summary>
+/// <returns>Message data</returns>
+const std::span<const std::uint8_t> WhackAStoodentServer::Message::GetData() const
 {
-	std::size_t data_size(GetDataSize());
-	result.resize(data_size);
-	if (data_size)
-	{
-		std::memcpy(result.data(), data.data() + 1, data.size() - static_cast<std::size_t>(1));
-	}
-	return result;
-}
-
-std::size_t WhackAStoodentServer::Message::GetDataSize() const
-{
-	return data.size() - static_cast<std::size_t>(1);
+	return data;
 }
