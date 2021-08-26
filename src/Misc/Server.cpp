@@ -65,7 +65,7 @@ WhackAStoodentServer::Server::Server(std::uint16_t port, std::uint32_t timeoutTi
 			{
 				peer->SendPeerMessage<WhackAStoodentServer::Messages::ErrorMessage>(EErrorType::InvalidMessageContext, L"You are already authenticated.");
 			}
-			else if (!user_id.is_nil() && userIDToPeerIDLookup.contains(user_id))
+			else if (!user_id.is_nil() && userIDToPeerLookup.contains(user_id))
 			{
 				peer->SendPeerMessage<WhackAStoodentServer::Messages::ErrorMessage>(EErrorType::Internal, L"User ID is already occupied.");
 			}
@@ -74,7 +74,7 @@ WhackAStoodentServer::Server::Server(std::uint16_t port, std::uint32_t timeoutTi
 				while (user_id.is_nil())
 				{
 					WhackAStoodentServer::UUIDs::CreateNewUUID(user_id);
-					if (userIDToPeerIDLookup.contains(user_id))
+					if (userIDToPeerLookup.contains(user_id))
 					{
 						user_id = uuids::uuid();
 					}
@@ -84,9 +84,9 @@ WhackAStoodentServer::Server::Server(std::uint16_t port, std::uint32_t timeoutTi
 					name = name.substr(static_cast<std::size_t>(0), WhackAStoodentServer::Rules::MaximalNameLength);
 				}
 				std::string session_code;
-				while (sessionCodeToUserIDLookup.contains(WhackAStoodentServer::SessionCodes::CreateSessionCode(session_code)));
+				while (sessionCodeToUserLookup.contains(WhackAStoodentServer::SessionCodes::CreateSessionCode(session_code)));
 				std::shared_ptr<WhackAStoodentServer::User> user(std::make_shared<WhackAStoodentServer::User>(peer, user_id, name, session_code, 0L));
-				sessionCodeToUserIDLookup.insert_or_assign(session_code, user);
+				sessionCodeToUserLookup.insert_or_assign(session_code, user);
 				user->OnConnected += [&, user]()
 				{
 					OnUserConnected(user);
@@ -171,9 +171,17 @@ WhackAStoodentServer::Server::Server(std::uint16_t port, std::uint32_t timeoutTi
 			AssertPeerIsAuthenticated
 			(
 				peer,
-				[](std::shared_ptr<WhackAStoodentServer::User> user)
+				[&](std::shared_ptr<WhackAStoodentServer::User> user)
 				{
 					// TODO: Find someone to match with
+					if (user->GetSessionCode().length() > static_cast<std::size_t>(0))
+					{
+
+					}
+					else
+					{
+						peer->SendPeerMessage<WhackAStoodentServer::Messages::ErrorMessage>(WhackAStoodentServer::EErrorType::InvalidMessageContext, L"You are already in a game.");
+					}
 				}
 			);
 		},
@@ -193,12 +201,12 @@ WhackAStoodentServer::Server::Server(std::uint16_t port, std::uint32_t timeoutTi
 				{
 					if (currentMessage.GetSessionCode() == user->GetSessionCode())
 					{
-						// TODO: Error
+						peer->SendPeerMessage<WhackAStoodentServer::Messages::ErrorMessage>(WhackAStoodentServer::EErrorType::InvalidMessageContext, L"You can't play with yourself.");
 					}
 					else
 					{
-						auto session_code_to_user_id_lookup_iterator(sessionCodeToUserIDLookup.find(std::string(currentMessage.GetSessionCode())));
-						if (session_code_to_user_id_lookup_iterator == sessionCodeToUserIDLookup.end())
+						auto session_code_to_user_lookup_iterator(sessionCodeToUserLookup.find(std::string(currentMessage.GetSessionCode())));
+						if (session_code_to_user_lookup_iterator == sessionCodeToUserLookup.end())
 						{
 							// TODO: Error
 						}
@@ -463,7 +471,7 @@ bool WhackAStoodentServer::Server::ProcessMessages()
 						if (users_iterator != users.end())
 						{
 							users_iterator->second->OnDisconnected();
-							userIDToPeerIDLookup.erase(users_iterator->second->GetUserID());
+							userIDToPeerLookup.erase(users_iterator->second->GetUserID());
 							users.erase(users_iterator);
 						}
 						if (peers_iterator != peers.end())
@@ -577,9 +585,17 @@ void WhackAStoodentServer::Server::AssertPeerIsInGame(std::shared_ptr<WhackAStoo
 	AssertPeerIsAuthenticated
 	(
 		peer,
-		[](std::shared_ptr<WhackAStoodentServer::User> user)
+		[&](std::shared_ptr<WhackAStoodentServer::User> user)
 		{
-			// TODO: Assert that peer is in game
+			auto user_id_to_game_lookup_iterator(userIDToGameLookup.find(user->GetUserID()));
+			if (user_id_to_game_lookup_iterator == userIDToGameLookup.end())
+			{
+				peer->SendPeerMessage<Messages::ErrorMessage>(WhackAStoodentServer::EErrorType::InvalidMessageContext, L"You are not in a game.");
+			}
+			else
+			{
+				onPeerIsInGame(user, user_id_to_game_lookup_iterator->second);
+			}
 		}
 	);
 }

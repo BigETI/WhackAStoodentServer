@@ -172,14 +172,19 @@ namespace WhackAStoodentServer
 		std::unordered_map<uuids::uuid, std::shared_ptr<Game>> games;
 
 		/// <summary>
-		/// User ID to peer ID lookup
+		/// User ID to peer lookup
 		/// </summary>
-		std::unordered_map<uuids::uuid, std::uint16_t> userIDToPeerIDLookup;
+		std::unordered_map<uuids::uuid, std::shared_ptr<Peer>> userIDToPeerLookup;
 
 		/// <summary>
-		/// Session code to user ID lookup
+		/// Session code to user lookup
 		/// </summary>
-		std::unordered_map<std::string, std::shared_ptr<User>> sessionCodeToUserIDLookup;
+		std::unordered_map<std::string, std::shared_ptr<User>> sessionCodeToUserLookup;
+
+		/// <summary>
+		/// User ID to game lookup
+		/// </summary>
+		std::unordered_map<uuids::uuid, std::shared_ptr<Game>> userIDToGameLookup;
 
 		/// <summary>
 		/// Message parser lists
