@@ -3,7 +3,9 @@
 #include <array>
 #include <memory>
 
+#include <Misc/Hole.hpp>
 #include <Misc/User.hpp>
+#include <Misc/Vector2D.hpp>
 
 /// <summary>
 /// Whack-A-Stoodent server namespace
@@ -16,6 +18,11 @@ namespace WhackAStoodentServer
 	class Game
 	{
 	public:
+
+		/// <summary>
+		/// Holes
+		/// </summary>
+		static const std::array<const Hole, 4ULL> Holes;
 
 		Game() = delete;
 

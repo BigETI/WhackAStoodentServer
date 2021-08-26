@@ -97,11 +97,29 @@ namespace WhackAStoodentServer
 		}
 
 		/// <summary>
+		/// Sets the X component
+		/// </summary>
+		/// <param name="x">X component</param>
+		virtual inline void SetX(T x)
+		{
+			this->x = x;
+		}
+
+		/// <summary>
+		/// Sets the Y component
+		/// </summary>
+		/// <param name="y">Y component</param>
+		virtual inline void SetY(T y)
+		{
+			this->y = y;
+		}
+
+		/// <summary>
 		/// Assigns a 2D vector to this object
 		/// </summary>
 		/// <param name="vector2D">2D vector</param>
 		/// <returns>This object</returns>
-		virtual Vector2D& operator=(const Vector2D<T>& vector2D)
+		virtual Vector2D<T>& operator=(const Vector2D<T>& vector2D)
 		{
 			x = vector2D.x;
 			y = vector2D.y;
@@ -113,11 +131,55 @@ namespace WhackAStoodentServer
 		/// </summary>
 		/// <param name="vector2D">2D vector</param>
 		/// <returns>This object</returns>
-		virtual Vector2D& operator=(Vector2D<T>&& vector2D) noexcept
+		virtual Vector2D<T>& operator=(Vector2D<T>&& vector2D) noexcept
 		{
 			x = vector2D.x;
 			y = vector2D.y;
 			return *this;
+		}
+
+		/// <summary>
+		/// Adds two vectors together
+		/// </summary>
+		/// <param name="vector2D">2D Vector</param>
+		/// <returns>Added vector</returns>
+		virtual Vector2D<T>& operator+=(const Vector2D<T>& vector2D) noexcept
+		{
+			x += vector2D.x;
+			y += vector2D.y;
+			return *this;
+		}
+
+		/// <summary>
+		/// Adds two vectors together
+		/// </summary>
+		/// <param name="vector2D">2D Vector</param>
+		/// <returns>Added vector</returns>
+		virtual Vector2D<T> operator+(const Vector2D<T>& vector2D) const noexcept
+		{
+			return Vector2D<T>(*this) += vector2D;
+		}
+
+		/// <summary>
+		/// Subtracts two vectors together
+		/// </summary>
+		/// <param name="vector2D">2D Vector</param>
+		/// <returns>Subtracted vector</returns>
+		virtual Vector2D<T>& operator-=(const Vector2D<T>& vector2D)noexcept
+		{
+			x -= vector2D.x;
+			y -= vector2D.y;
+			return *this;
+		}
+
+		/// <summary>
+		/// Subtracts two vectors together
+		/// </summary>
+		/// <param name="vector2D">2D Vector</param>
+		/// <returns>Subtracted vector</returns>
+		virtual Vector2D<T> operator-(const Vector2D<T>& vector2D) const noexcept
+		{
+			return Vector2D<T>(*this) -= vector2D;
 		}
 
 		/// <summary>
