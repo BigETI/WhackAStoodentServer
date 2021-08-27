@@ -37,12 +37,13 @@ target_sources(${WHACK_A_STOODENT_SERVER_PROJECT} PRIVATE
 	"${CMAKE_CURRENT_SOURCE_DIR}/Messages/PongMessage.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Messages/RequestPlayMessage.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Messages/ScoreMoleMessage.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/Messages/StartedGameMessage.cpp"
 	
 	# Misc
 	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Bans.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Game.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Games.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Hole.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Lobby.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/MatchHistoryEntry.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Message.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Peer.cpp"

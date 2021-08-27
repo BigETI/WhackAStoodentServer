@@ -8,7 +8,7 @@
 /// Constructs a play with session code message
 /// </summary>
 WhackAStoodentServer::Messages::PlayWithSessionCodeMessage::PlayWithSessionCodeMessage() :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::PlayWithSessionCode>(),
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::PlayWithSessionCode>(),
 	sessionCode(SessionCodeCharacterCount, '0')
 {
 	// ...
@@ -19,7 +19,7 @@ WhackAStoodentServer::Messages::PlayWithSessionCodeMessage::PlayWithSessionCodeM
 /// </summary>
 /// <param name="sessionCode">Session code</param>
 WhackAStoodentServer::Messages::PlayWithSessionCodeMessage::PlayWithSessionCodeMessage(std::string_view sessionCode) :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::PlayWithSessionCode>(),
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::PlayWithSessionCode>(),
 	sessionCode(sessionCode)
 {
 	if (!SessionCodes::IsSessionCodeValid(sessionCode))
@@ -52,11 +52,8 @@ std::string_view WhackAStoodentServer::Messages::PlayWithSessionCodeMessage::Get
 /// <returns>Serialized contents</returns>
 std::vector<std::uint8_t>& WhackAStoodentServer::Messages::PlayWithSessionCodeMessage::Serialize(std::vector<std::uint8_t>& result) const
 {
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::PlayWithSessionCode>::Serialize(result);
-	std::size_t offset(result.size());
-	result.resize(result.size() + (SessionCodeCharacterCount * sizeof(std::string::value_type)));
-	std::memcpy(result.data() + offset, sessionCode.data(), SessionCodeCharacterCount * sizeof(std::string::value_type));
-	return result;
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::PlayWithSessionCode>::Serialize(result);
+	return WhackAStoodentServer::SessionCodes::Serialize(sessionCode, result);
 }
 
 /// <summary>
@@ -66,11 +63,6 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::PlayWithSessionCodeMe
 /// <returns>Remaining data to deserialize</returns>
 std::span<std::uint8_t const> WhackAStoodentServer::Messages::PlayWithSessionCodeMessage::Deserialize(const std::span<std::uint8_t const>& data)
 {
-	std::span<std::uint8_t const> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::PlayWithSessionCode>::Deserialize(data));
-	if (next_bytes.size() < SessionCodeCharacterCount)
-	{
-		throw DeserializationFailedException();
-	}
-	std::memcpy(sessionCode.data(), next_bytes.data(), SessionCodeCharacterCount * sizeof(std::string::value_type));
-	return next_bytes.subspan<SessionCodeCharacterCount * sizeof(std::string::value_type)>();
+	std::span<std::uint8_t const> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::PlayWithSessionCode>::Deserialize(data));
+	return WhackAStoodentServer::SessionCodes::Deserialize(next_bytes, sessionCode);
 }

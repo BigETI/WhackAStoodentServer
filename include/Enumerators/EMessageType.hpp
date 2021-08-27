@@ -76,6 +76,11 @@ namespace WhackAStoodentServer
 		DenyPlayRequest,
 
 		/// <summary>
+		/// Started game message type
+		/// </summary>
+		StartedGame,
+
+		/// <summary>
 		/// User has loaded game message type
 		/// </summary>
 		LoadedGame,

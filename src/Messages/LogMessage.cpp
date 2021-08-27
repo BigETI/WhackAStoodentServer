@@ -6,7 +6,7 @@
 /// Constructs a log message
 /// </summary>
 WhackAStoodentServer::Messages::LogMessage::LogMessage() :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Log>(),
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Log>(),
 	logLevel(ELogLevel::Information)
 {
 	// ...
@@ -18,7 +18,7 @@ WhackAStoodentServer::Messages::LogMessage::LogMessage() :
 /// <param name="logLevel">Log level</param>
 /// <param name="logMessage">Log message</param>
 WhackAStoodentServer::Messages::LogMessage::LogMessage(ELogLevel logLevel, std::wstring_view logMessage) :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Log>(),
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Log>(),
 	logLevel(logLevel),
 	logMessage(logMessage)
 {
@@ -59,8 +59,8 @@ std::wstring_view WhackAStoodentServer::Messages::LogMessage::GetLogMessage() co
 std::vector<std::uint8_t>& WhackAStoodentServer::Messages::LogMessage::Serialize(std::vector<std::uint8_t>& result) const
 {
 	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Log>::Serialize(result);
-	NumericSerializer::SerializeByte(static_cast<std::uint8_t>(logLevel), result);
-	StringSerializer::SerializeIntegerSizedString(logMessage, result);
+	WhackAStoodentServer::NumericSerializer::SerializeByte(static_cast<std::uint8_t>(logLevel), result);
+	WhackAStoodentServer::StringSerializer::SerializeIntegerSizedString(logMessage, result);
 	return result;
 }
 
@@ -72,8 +72,8 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::LogMessage::Serialize
 std::span<std::uint8_t const> WhackAStoodentServer::Messages::LogMessage::Deserialize(const std::span<std::uint8_t const>& data)
 {
 	std::uint8_t log_level_index;
-	std::span<std::uint8_t const> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Log>::Deserialize(data));
-	next_bytes = NumericSerializer::DeserializeByte(next_bytes, log_level_index);
+	std::span<std::uint8_t const> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Log>::Deserialize(data));
+	next_bytes = WhackAStoodentServer::NumericSerializer::DeserializeByte(next_bytes, log_level_index);
 	logLevel = static_cast<WhackAStoodentServer::ELogLevel>(log_level_index);
-	return StringSerializer::DeserializeIntegerSizedString(next_bytes, logMessage);
+	return WhackAStoodentServer::StringSerializer::DeserializeIntegerSizedString(next_bytes, logMessage);
 }

@@ -4,7 +4,7 @@
 /// Constructs a hit message
 /// </summary>
 WhackAStoodentServer::Messages::HitMessage::HitMessage() :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Hit>()
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Hit>()
 {
 	// ...
 }
@@ -14,7 +14,7 @@ WhackAStoodentServer::Messages::HitMessage::HitMessage() :
 /// </summary>
 /// <param name="position">Position</param>
 WhackAStoodentServer::Messages::HitMessage::HitMessage(const WhackAStoodentServer::Vector2D<float>& position) :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Hit>(),
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Hit>(),
 	position(position)
 {
 	// ...
@@ -44,7 +44,7 @@ const WhackAStoodentServer::Vector2D<float>& WhackAStoodentServer::Messages::Hit
 /// <returns>Serialized contents</returns>
 std::vector<std::uint8_t>& WhackAStoodentServer::Messages::HitMessage::Serialize(std::vector<std::uint8_t>& result) const
 {
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Hit>::Serialize(result);
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Hit>::Serialize(result);
 	return position.Serialize(result);
 }
 
@@ -55,6 +55,6 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::HitMessage::Serialize
 /// <returns>Remaining data to deserialize</returns>
 std::span<std::uint8_t const> WhackAStoodentServer::Messages::HitMessage::Deserialize(const std::span<std::uint8_t const>& data)
 {
-	std::span<std::uint8_t const> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Hit>::Deserialize(data));
+	std::span<std::uint8_t const> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Hit>::Deserialize(data));
 	return position.Deserialize(next_bytes);
 }

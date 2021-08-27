@@ -1,4 +1,5 @@
 #include <Messages/AcknowledgeAuthentificationMessage.hpp>
+#include <Static/SessionCodes.hpp>
 #include <Static/StringSerializer.hpp>
 #include <Static/UUIDs.hpp>
 
@@ -6,7 +7,7 @@
 /// Constructs an acknowledge authentification message
 /// </summary>
 WhackAStoodentServer::Messages::AcknowledgeAuthentificationMessage::AcknowledgeAuthentificationMessage() :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::AcknowledgeAuthentification>()
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::AcknowledgeAuthentification>()
 {
 	// ...
 }
@@ -15,10 +16,12 @@ WhackAStoodentServer::Messages::AcknowledgeAuthentificationMessage::AcknowledgeA
 /// Constructs an acknowledge authentification message
 /// </summary>
 /// <param name="userID">User ID</param>
+/// <param name="sessionCode">Session code</param>
 /// <param name="username">Username</param>
-WhackAStoodentServer::Messages::AcknowledgeAuthentificationMessage::AcknowledgeAuthentificationMessage(const uuids::uuid& userID, std::wstring_view username) :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::AcknowledgeAuthentification>(),
+WhackAStoodentServer::Messages::AcknowledgeAuthentificationMessage::AcknowledgeAuthentificationMessage(const uuids::uuid& userID, std::string_view sessionCode, std::wstring_view username) :
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::AcknowledgeAuthentification>(),
 	userID(userID),
+	sessionCode(sessionCode),
 	username(username)
 {
 	// ...
@@ -42,6 +45,15 @@ const uuids::uuid& WhackAStoodentServer::Messages::AcknowledgeAuthentificationMe
 }
 
 /// <summary>
+/// Gets the session code
+/// </summary>
+/// <returns>Session code</returns>
+std::string_view WhackAStoodentServer::Messages::AcknowledgeAuthentificationMessage::GetSessionCode() const
+{
+	return sessionCode;
+}
+
+/// <summary>
 /// Gets the user name
 /// </summary>
 /// <returns>Username</returns>
@@ -57,9 +69,10 @@ std::wstring_view WhackAStoodentServer::Messages::AcknowledgeAuthentificationMes
 /// <returns>Serialized contents</returns>
 std::vector<std::uint8_t>& WhackAStoodentServer::Messages::AcknowledgeAuthentificationMessage::Serialize(std::vector<std::uint8_t>& result) const
 {
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::AcknowledgeAuthentification>::Serialize(result);
-	UUIDs::SerializeUUID(userID, result);
-	return StringSerializer::Serialize<std::uint8_t>(username, result);
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::AcknowledgeAuthentification>::Serialize(result);
+	WhackAStoodentServer::UUIDs::SerializeUUID(userID, result);
+	WhackAStoodentServer::SessionCodes::Serialize(sessionCode, result);
+	return WhackAStoodentServer::StringSerializer::Serialize<std::uint8_t>(username, result);
 }
 
 /// <summary>
@@ -69,7 +82,8 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::AcknowledgeAuthentifi
 /// <returns>Remaining data to deserialize</returns>
 std::span<const std::uint8_t> WhackAStoodentServer::Messages::AcknowledgeAuthentificationMessage::Deserialize(const std::span<const std::uint8_t>& data)
 {
-	std::span<std::uint8_t const> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::AcknowledgeAuthentification>::Deserialize(data));
-	next_bytes = UUIDs::DeserializeUUID(next_bytes, userID);
-	return StringSerializer::DeserializeByteSizedString(next_bytes, username);
+	std::span<std::uint8_t const> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::AcknowledgeAuthentification>::Deserialize(data));
+	next_bytes = WhackAStoodentServer::UUIDs::DeserializeUUID(next_bytes, userID);
+	next_bytes = WhackAStoodentServer::SessionCodes::Deserialize(next_bytes, sessionCode);
+	return WhackAStoodentServer::StringSerializer::DeserializeByteSizedString(next_bytes, username);
 }

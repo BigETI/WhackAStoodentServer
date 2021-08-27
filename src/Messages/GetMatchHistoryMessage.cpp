@@ -6,7 +6,7 @@
 /// Construicts a get match history message
 /// </summary>
 WhackAStoodentServer::Messages::GetMatchHistoryMessage::GetMatchHistoryMessage() :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::GetMatchHistory>()
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::GetMatchHistory>()
 {
 	// ...
 }

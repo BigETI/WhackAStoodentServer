@@ -4,6 +4,7 @@
 #include <string_view>
 
 #include <Abstract/ASerializableMessage.hpp>
+#include <Enumerators/EPlayerRole.hpp>
 
 /// <summary>
 /// Whack-A-Stoodent server namespace
@@ -16,34 +17,34 @@ namespace WhackAStoodentServer
 	namespace Messages
 	{
 		/// <summary>
-		/// A class that describes a request play message
+		/// A class that describes a started game message
 		/// </summary>
-		class RequestPlayMessage : public ASerializableMessage<EMessageType::RequestPlay>
+		class StartedGameMessage : public ASerializableMessage<EMessageType::StartedGame>
 		{
 		public:
 
 			/// <summary>
-			/// Constructs a request play message
+			/// Constructs a started game message
 			/// </summary>
-			RequestPlayMessage();
+			StartedGameMessage();
 
 			/// <summary>
-			/// Constructs a request play message
+			/// Constructs a started game message
 			/// </summary>
 			/// <param name="opponentSessionCode">Opponent's session code</param>
 			/// <param name="opponentName">Opponent's name</param>
-			RequestPlayMessage(std::string_view opponentSessionCode, std::wstring_view opponentName);
+			StartedGameMessage(EPlayerRole yourRole, std::wstring_view opponentName);
 
 			/// <summary>
-			/// Destroys request play message
+			/// Destroys started game message
 			/// </summary>
-			virtual ~RequestPlayMessage() override;
+			virtual ~StartedGameMessage() override;
 
 			/// <summary>
-			/// Gets the opponent's session code
+			/// Gets your role
 			/// </summary>
-			/// <returns>Opponent's session code</returns>
-			virtual std::string_view GetOpponentSessionCode() const;
+			/// <returns>Your role</returns>
+			virtual EPlayerRole GetYourRole() const;
 
 			/// <summary>
 			/// Gets the opponent's name
@@ -68,9 +69,9 @@ namespace WhackAStoodentServer
 		private:
 
 			/// <summary>
-			/// Opponent's session code
+			/// Your role
 			/// </summary>
-			std::string opponentSessionCode;
+			EPlayerRole yourRole;
 
 			/// <summary>
 			/// Opponent's name

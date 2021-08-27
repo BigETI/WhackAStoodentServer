@@ -4,7 +4,7 @@
 /// Constructs a loaded game message
 /// </summary>
 WhackAStoodentServer::Messages::LoadedGameMessage::LoadedGameMessage() :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::LoadedGame>()
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::LoadedGame>()
 {
 	// ...
 }

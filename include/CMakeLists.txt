@@ -13,7 +13,6 @@ target_sources(${WHACK_A_STOODENT_SERVER_PROJECT} PRIVATE
 	"${CMAKE_CURRENT_SOURCE_DIR}/Enumerators/EDisconnectionReason.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Enumerators/EErrorType.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Enumerators/ELogLevel.hpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/Enumerators/ELookHole.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Enumerators/EMessageType.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Enumerators/EPlayerRole.hpp"
 	
@@ -51,13 +50,14 @@ target_sources(${WHACK_A_STOODENT_SERVER_PROJECT} PRIVATE
 	"${CMAKE_CURRENT_SOURCE_DIR}/Messages/PongMessage.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Messages/RequestPlayMessage.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Messages/ScoreMoleMessage.hpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/Messages/StartedGameMessage.hpp"
 	
 	# Misc
 	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Bans.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Event.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Game.hpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Games.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Hole.hpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Lobby.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/MatchHistoryEntry.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Message.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/MessageParser.hpp"

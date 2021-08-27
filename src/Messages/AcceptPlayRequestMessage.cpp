@@ -4,7 +4,7 @@
 /// Constructs an accept playe request message
 /// </summary>
 WhackAStoodentServer::Messages::AcceptPlayRequestMessage::AcceptPlayRequestMessage() :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::AcceptPlayRequest>()
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::AcceptPlayRequest>()
 {
 	// ...
 }

@@ -1,7 +1,8 @@
 #pragma once
 
+#include <cstddef>
+
 #include <Abstract/ASerializableMessage.hpp>
-#include <Enumerators/ELookHole.hpp>
 
 /// <summary>
 /// Whack-A-Stoodent server namespace
@@ -29,13 +30,13 @@ namespace WhackAStoodentServer
 			/// Constructs a look message
 			/// </summary>
 			/// <param name="lookHole">Look hole</param>
-			LookMessage(ELookHole lookHole);
+			LookMessage(std::size_t lookHole);
 
 			/// <summary>
 			/// Gets the look hole
 			/// </summary>
 			/// <returns>Look hole</returns>
-			ELookHole GetLookHole() const;
+			std::size_t GetLookHole() const;
 
 			/// <summary>
 			/// Serializes contents
@@ -56,7 +57,7 @@ namespace WhackAStoodentServer
 			/// <summary>
 			/// Look hole
 			/// </summary>
-			ELookHole lookHole;
+			std::size_t lookHole;
 		};
 	}
 }

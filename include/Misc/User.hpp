@@ -112,6 +112,18 @@ namespace WhackAStoodentServer
 		virtual void ResetSessionCode();
 
 		/// <summary>
+		/// Is game loaded
+		/// </summary>
+		/// <returns>"true" if game has been loaded, otherwise "false"</returns>
+		virtual bool IsGameLoaded();
+
+		/// <summary>
+		/// Set game loaded state
+		/// </summary>
+		/// <param name="newGameLoadedState">New game loaded state</param>
+		virtual void SetGameLoadedState(bool newGameLoadedState);
+
+		/// <summary>
 		/// Gets the score
 		/// </summary>
 		/// <returns>Score</returns>
@@ -122,6 +134,27 @@ namespace WhackAStoodentServer
 		/// </summary>
 		/// <param name="newScore">New score</param>
 		virtual void SetScore(std::int64_t newScore);
+
+		/// <summary>
+		/// Is specified user blocked
+		/// </summary>
+		/// <param name="user">User</param>
+		/// <returns>"true" if specified user has been blocked, otherwise "false</returns>
+		virtual bool IsUserBlocked(std::shared_ptr<User> user) const;
+
+		/// <summary>
+		/// Blocks specified user
+		/// </summary>
+		/// <param name="user">User</param>
+		/// <returns>"true" if specified user has been successfully blocked, otherwise "false"</returns>
+		virtual bool BlockUser(std::shared_ptr<User> user);
+
+		/// <summary>
+		/// Unblocks specified user
+		/// </summary>
+		/// <param name="user">User</param>
+		/// <returns>"true" if user has been successfully unblocked, otherwise "false"</returns>
+		virtual bool UnblockUser(std::shared_ptr<User> user);
 
 	private:
 
@@ -146,8 +179,18 @@ namespace WhackAStoodentServer
 		std::string sessionCode;
 
 		/// <summary>
+		/// Is game loaded
+		/// </summary>
+		bool isGameLoaded;
+
+		/// <summary>
 		/// Score
 		/// </summary>
 		std::int64_t score;
+
+		/// <summary>
+		/// Blocked users
+		/// </summary>
+		std::unordered_map<uuids::uuid, std::shared_ptr<User>> blockedUsers;
 	};
 }

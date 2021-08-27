@@ -5,8 +5,8 @@
 /// Constructs a look message
 /// </summary>
 WhackAStoodentServer::Messages::LookMessage::LookMessage() :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Look>(),
-	lookHole(WhackAStoodentServer::ELookHole::Top)
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Look>(),
+	lookHole(static_cast<std::size_t>(0))
 {
 	// ...
 }
@@ -15,8 +15,8 @@ WhackAStoodentServer::Messages::LookMessage::LookMessage() :
 /// Constructs a look message
 /// </summary>
 /// <param name="lookHole">Look hole</param>
-WhackAStoodentServer::Messages::LookMessage::LookMessage(WhackAStoodentServer::ELookHole lookHole) :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Look>(),
+WhackAStoodentServer::Messages::LookMessage::LookMessage(std::size_t lookHole) :
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Look>(),
 	lookHole(lookHole)
 {
 	// ...
@@ -26,7 +26,7 @@ WhackAStoodentServer::Messages::LookMessage::LookMessage(WhackAStoodentServer::E
 /// Gets the look hole
 /// </summary>
 /// <returns>Look hole</returns>
-WhackAStoodentServer::ELookHole WhackAStoodentServer::Messages::LookMessage::GetLookHole() const
+std::size_t WhackAStoodentServer::Messages::LookMessage::GetLookHole() const
 {
 	return lookHole;
 }
@@ -38,8 +38,8 @@ WhackAStoodentServer::ELookHole WhackAStoodentServer::Messages::LookMessage::Get
 /// <returns>Serialized contents</returns>
 std::vector<std::uint8_t>& WhackAStoodentServer::Messages::LookMessage::Serialize(std::vector<std::uint8_t>& result) const
 {
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Look>::Serialize(result);
-	return NumericSerializer::SerializeByte(static_cast<std::uint8_t>(lookHole), result);
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Look>::Serialize(result);
+	return WhackAStoodentServer::NumericSerializer::SerializeByte(static_cast<std::uint8_t>(lookHole), result);
 }
 
 /// <summary>
@@ -50,8 +50,8 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::LookMessage::Serializ
 std::span<std::uint8_t const> WhackAStoodentServer::Messages::LookMessage::Deserialize(const std::span<std::uint8_t const>& data)
 {
 	std::uint8_t look_hole_index;
-	std::span<std::uint8_t const> ret(WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Look>::Deserialize(data));
-	ret = NumericSerializer::DeserializeByte(ret, look_hole_index);
-	lookHole = static_cast<WhackAStoodentServer::ELookHole>(look_hole_index);
+	std::span<std::uint8_t const> ret(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Look>::Deserialize(data));
+	ret = WhackAStoodentServer::NumericSerializer::DeserializeByte(ret, look_hole_index);
+	lookHole = static_cast<std::size_t>(look_hole_index);
 	return ret;
 }

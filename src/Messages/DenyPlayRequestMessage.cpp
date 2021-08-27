@@ -5,7 +5,7 @@
 /// Constructs a deny play request message
 /// </summary>
 WhackAStoodentServer::Messages::DenyPlayRequestMessage::DenyPlayRequestMessage() :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::DenyPlayRequest>(),
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::DenyPlayRequest>(),
 	reason(WhackAStoodentServer::EDenyPlayRequestReason::NoReason)
 {
 	// ...
@@ -16,7 +16,7 @@ WhackAStoodentServer::Messages::DenyPlayRequestMessage::DenyPlayRequestMessage()
 /// </summary>
 /// <param name="reason">Reason</param>
 WhackAStoodentServer::Messages::DenyPlayRequestMessage::DenyPlayRequestMessage(WhackAStoodentServer::EDenyPlayRequestReason reason) :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::DenyPlayRequest>(),
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::DenyPlayRequest>(),
 	reason(reason)
 {
 	// ...
@@ -46,8 +46,8 @@ WhackAStoodentServer::EDenyPlayRequestReason WhackAStoodentServer::Messages::Den
 /// <returns>Serialized contents</returns>
 std::vector<std::uint8_t>& WhackAStoodentServer::Messages::DenyPlayRequestMessage::Serialize(std::vector<std::uint8_t>& result) const
 {
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::DenyPlayRequest>::Serialize(result);
-	return NumericSerializer::SerializeByte(static_cast<std::uint8_t>(reason), result);
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::DenyPlayRequest>::Serialize(result);
+	return WhackAStoodentServer::NumericSerializer::SerializeByte(static_cast<std::uint8_t>(reason), result);
 }
 
 /// <summary>
@@ -59,7 +59,7 @@ std::span<std::uint8_t const> WhackAStoodentServer::Messages::DenyPlayRequestMes
 {
 	std::span<std::uint8_t const> ret(WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::DenyPlayRequest>::Deserialize(data));
 	std::uint8_t reason_id;
-	ret = NumericSerializer::DeserializeByte(ret, reason_id);
+	ret = WhackAStoodentServer::NumericSerializer::DeserializeByte(ret, reason_id);
 	reason = static_cast<WhackAStoodentServer::EDenyPlayRequestReason>(reason_id);
 	return ret;
 }

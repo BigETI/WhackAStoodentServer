@@ -4,7 +4,7 @@
 /// Constructs a hide message
 /// </summary>
 WhackAStoodentServer::Messages::HideMessage::HideMessage() :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Hide>()
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Hide>()
 {
 	// ...
 }

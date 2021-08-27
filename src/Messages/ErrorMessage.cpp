@@ -6,7 +6,7 @@
 /// Constructs an error message
 /// </summary>
 WhackAStoodentServer::Messages::ErrorMessage::ErrorMessage() :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Error>(),
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Error>(),
 	errorType(EErrorType::Unknown)
 {
 	// ...
@@ -18,7 +18,7 @@ WhackAStoodentServer::Messages::ErrorMessage::ErrorMessage() :
 /// <param name="errorType">Error type</param>
 /// <param name="errorMessage">Error message</param>
 WhackAStoodentServer::Messages::ErrorMessage::ErrorMessage(EErrorType errorType, std::wstring_view errorMessage) :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Error>(),
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Error>(),
 	errorType(errorType),
 	errorMessage(errorMessage)
 {
@@ -58,9 +58,9 @@ std::wstring_view WhackAStoodentServer::Messages::ErrorMessage::GetErrorMessage(
 /// <returns>Serialized contents</returns>
 std::vector<std::uint8_t>& WhackAStoodentServer::Messages::ErrorMessage::Serialize(std::vector<std::uint8_t>& result) const
 {
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Error>::Serialize(result);
-	NumericSerializer::SerializeByte(static_cast<std::uint8_t>(errorType), result);
-	StringSerializer::SerializeIntegerSizedString(errorMessage, result);
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Error>::Serialize(result);
+	WhackAStoodentServer::NumericSerializer::SerializeByte(static_cast<std::uint8_t>(errorType), result);
+	WhackAStoodentServer::StringSerializer::SerializeIntegerSizedString(errorMessage, result);
 	return result;
 }
 
@@ -72,8 +72,8 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::ErrorMessage::Seriali
 std::span<std::uint8_t const> WhackAStoodentServer::Messages::ErrorMessage::Deserialize(const std::span<std::uint8_t const>& data)
 {
 	std::uint8_t error_type_index;
-	std::span<std::uint8_t const> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Error>::Deserialize(data));
-	next_bytes = NumericSerializer::DeserializeByte(next_bytes, error_type_index);
+	std::span<std::uint8_t const> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Error>::Deserialize(data));
+	next_bytes = WhackAStoodentServer::NumericSerializer::DeserializeByte(next_bytes, error_type_index);
 	errorType = static_cast<WhackAStoodentServer::EErrorType>(error_type_index);
-	return StringSerializer::DeserializeIntegerSizedString(next_bytes, errorMessage);
+	return WhackAStoodentServer::StringSerializer::DeserializeIntegerSizedString(next_bytes, errorMessage);
 }

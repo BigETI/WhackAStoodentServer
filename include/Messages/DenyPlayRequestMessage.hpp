@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <string_view>
+
 #include <Abstract/ASerializableMessage.hpp>
 #include <Enumerators/EDenyPlayRequestReason.hpp>
 

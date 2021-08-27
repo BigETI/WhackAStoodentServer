@@ -33,8 +33,9 @@ namespace WhackAStoodentServer
 			/// Constructs an acknowledge authentification message
 			/// </summary>
 			/// <param name="userID">User ID</param>
+			/// <param name="sessionCode">Session code</param>
 			/// <param name="username">Username</param>
-			AcknowledgeAuthentificationMessage(const uuids::uuid& userID, std::wstring_view username);
+			AcknowledgeAuthentificationMessage(const uuids::uuid& userID, std::string_view sessionCode, std::wstring_view username);
 
 			/// <summary>
 			/// Destroys acknowledge authentification message
@@ -46,6 +47,12 @@ namespace WhackAStoodentServer
 			/// </summary>
 			/// <returns>User ID</returns>
 			virtual const uuids::uuid& GetUserID() const;
+
+			/// <summary>
+			/// Gets the session code
+			/// </summary>
+			/// <returns>Session code</returns>
+			virtual std::string_view GetSessionCode() const;
 
 			/// <summary>
 			/// Gets the user name
@@ -73,6 +80,11 @@ namespace WhackAStoodentServer
 			/// User ID
 			/// </summary>
 			uuids::uuid userID;
+
+			/// <summary>
+			/// Session code
+			/// </summary>
+			std::string sessionCode;
 
 			/// <summary>
 			/// Username

@@ -108,6 +108,24 @@ void WhackAStoodentServer::User::ResetSessionCode()
 }
 
 /// <summary>
+/// Is game loaded
+/// </summary>
+/// <returns>"true" if game has been loaded, otherwise "false"</returns>
+bool WhackAStoodentServer::User::IsGameLoaded()
+{
+	return isGameLoaded;
+}
+
+/// <summary>
+/// Set game loaded state
+/// </summary>
+/// <param name="newGameLoadedState">New game loaded state</param>
+void WhackAStoodentServer::User::SetGameLoadedState(bool newGameLoadedState)
+{
+	isGameLoaded = newGameLoadedState;
+}
+
+/// <summary>
 /// Gets the score
 /// </summary>
 /// <returns>Score</returns>
@@ -123,4 +141,39 @@ std::int64_t WhackAStoodentServer::User::GetScore() const
 void WhackAStoodentServer::User::SetScore(std::int64_t newScore)
 {
 	score = newScore;
+}
+
+/// <summary>
+/// Is specified user blocked
+/// </summary>
+/// <param name="user">User</param>
+/// <returns>"true" if specified user has been blocked, otherwise "false</returns>
+bool WhackAStoodentServer::User::IsUserBlocked(std::shared_ptr<WhackAStoodentServer::User> user) const
+{
+	return user && blockedUsers.contains(user->GetUserID());
+}
+
+/// <summary>
+/// Blocks specified user
+/// </summary>
+/// <param name="user">User</param>
+/// <returns>"true" if specified user has been successfully blocked, otherwise "false"</returns>
+bool WhackAStoodentServer::User::BlockUser(std::shared_ptr<WhackAStoodentServer::User> user)
+{
+	bool ret(!blockedUsers.contains(user->GetUserID()));
+	if (ret)
+	{
+		blockedUsers.insert_or_assign(user->GetUserID(), user);
+	}
+	return ret;
+}
+
+/// <summary>
+/// Unblocks specified user
+/// </summary>
+/// <param name="user">User</param>
+/// <returns>"true" if user has been successfully unblocked, otherwise "false"</returns>
+bool WhackAStoodentServer::User::UnblockUser(std::shared_ptr<WhackAStoodentServer::User> user)
+{
+	return !!blockedUsers.erase(user->GetUserID());
 }

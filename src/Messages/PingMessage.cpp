@@ -5,7 +5,7 @@
 /// Constructs a ping message
 /// </summary>
 WhackAStoodentServer::Messages::PingMessage::PingMessage() :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Ping>(),
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Ping>(),
 	pingData(static_cast<std::int32_t>(0))
 {
 	// ...
@@ -16,7 +16,7 @@ WhackAStoodentServer::Messages::PingMessage::PingMessage() :
 /// </summary>
 /// <param name="pingData">Ping data</param>
 WhackAStoodentServer::Messages::PingMessage::PingMessage(std::int32_t pingData) :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Ping>(),
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Ping>(),
 	pingData(pingData)
 {
 	// ...
@@ -46,8 +46,8 @@ std::int32_t WhackAStoodentServer::Messages::PingMessage::GetPingData() const
 /// <returns>Serialized contents</returns>
 std::vector<std::uint8_t>& WhackAStoodentServer::Messages::PingMessage::Serialize(std::vector<std::uint8_t>& result) const
 {
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Ping>::Serialize(result);
-	return NumericSerializer::SerializeInteger(pingData, result);
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Ping>::Serialize(result);
+	return WhackAStoodentServer::NumericSerializer::SerializeInteger(pingData, result);
 }
 
 /// <summary>
@@ -57,6 +57,6 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::PingMessage::Serializ
 /// <returns>Remaining data to deserialize</returns>
 std::span<const std::uint8_t> WhackAStoodentServer::Messages::PingMessage::Deserialize(const std::span<const std::uint8_t>& data)
 {
-	std::span<std::uint8_t const> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Ping>::Deserialize(data));
-	return NumericSerializer::DeserializeInteger(next_bytes, pingData);
+	std::span<std::uint8_t const> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Ping>::Deserialize(data));
+	return WhackAStoodentServer::NumericSerializer::DeserializeInteger(next_bytes, pingData);
 }

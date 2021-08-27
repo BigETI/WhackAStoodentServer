@@ -5,7 +5,7 @@
 /// Constructs a score mole message
 /// </summary>
 WhackAStoodentServer::Messages::ScoreMoleMessage::ScoreMoleMessage() :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::ScoreMole>(),
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::ScoreMole>(),
 	points(static_cast<std::int64_t>(0))
 {
 	// ...
@@ -16,7 +16,7 @@ WhackAStoodentServer::Messages::ScoreMoleMessage::ScoreMoleMessage() :
 /// </summary>
 /// <param name="points">Points</param>
 WhackAStoodentServer::Messages::ScoreMoleMessage::ScoreMoleMessage(std::int64_t points) :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::ScoreMole>(),
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::ScoreMole>(),
 	points(points)
 {
 	// ...
@@ -46,8 +46,8 @@ std::int64_t WhackAStoodentServer::Messages::ScoreMoleMessage::GetPoints() const
 /// <returns>Serialized contents</returns>
 std::vector<std::uint8_t>& WhackAStoodentServer::Messages::ScoreMoleMessage::Serialize(std::vector<std::uint8_t>& result) const
 {
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::ScoreMole>::Serialize(result);
-	return NumericSerializer::SerializeLong(points, result);
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::ScoreMole>::Serialize(result);
+	return WhackAStoodentServer::NumericSerializer::SerializeLong(points, result);
 }
 
 /// <summary>
@@ -57,6 +57,6 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::ScoreMoleMessage::Ser
 /// <returns>Remaining data to deserialize</returns>
 std::span<std::uint8_t const> WhackAStoodentServer::Messages::ScoreMoleMessage::Deserialize(const std::span<std::uint8_t const>& data)
 {
-	std::span<std::uint8_t const> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::ScoreMole>::Deserialize(data));
-	return NumericSerializer::DeserializeLong(next_bytes, points);
+	std::span<std::uint8_t const> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::ScoreMole>::Deserialize(data));
+	return WhackAStoodentServer::NumericSerializer::DeserializeLong(next_bytes, points);
 }

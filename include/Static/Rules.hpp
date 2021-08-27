@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 
 /// <summary>
 /// Whack-A-Stoodent server namespace
@@ -23,6 +24,11 @@ namespace WhackAStoodentServer
 		/// Session code character count
 		/// </summary>
 		static constexpr const std::size_t SessionCodeCharacterCount = static_cast<const std::size_t>(6);
+
+		/// <summary>
+		/// Hitting score
+		/// </summary>
+		static constexpr const std::int64_t HittingScore = static_cast<const std::int64_t>(1);
 
 		Rules() = delete;
 		Rules(const Rules&) = delete;

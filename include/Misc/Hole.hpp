@@ -30,11 +30,23 @@ namespace WhackAStoodentServer
 		virtual ~Hole();
 
 		/// <summary>
+		/// Gets the position
+		/// </summary>
+		/// <returns>Position</returns>
+		virtual const Vector2D<float>& GetPosition() const;
+
+		/// <summary>
+		/// Gets the radius
+		/// </summary>
+		/// <returns>Radius</returns>
+		virtual const Vector2D<float>& GetRadius() const;
+
+		/// <summary>
 		/// Is position in hole
 		/// </summary>
 		/// <param name="position">Position</param>
 		/// <returns>"true" if position is in hole, otherwise "false"</returns>
-		bool IsPositionInHole(const Vector2D<float>& position);
+		virtual bool IsPositionInHole(const Vector2D<float>& position) const;
 
 		Hole& operator=(const Hole&) = delete;
 		Hole& operator=(Hole&&) = delete;

@@ -7,7 +7,7 @@
 /// Constructs an end game message
 /// </summary>
 WhackAStoodentServer::Messages::EndGameMessage::EndGameMessage() :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::EndGame>()
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::EndGame>()
 {
 	// ...
 }
@@ -17,7 +17,7 @@ WhackAStoodentServer::Messages::EndGameMessage::EndGameMessage() :
 /// </summary>
 /// <param name="matchHistory">Match history</param>
 WhackAStoodentServer::Messages::EndGameMessage::EndGameMessage(const std::vector<WhackAStoodentServer::MatchHistoryEntry>& matchHistory) :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::EndGame>(),
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::EndGame>(),
 	matchHistory(matchHistory)
 {
 	// ...
@@ -28,7 +28,7 @@ WhackAStoodentServer::Messages::EndGameMessage::EndGameMessage(const std::vector
 /// </summary>
 /// <param name="matchHistory">Match history</param>
 WhackAStoodentServer::Messages::EndGameMessage::EndGameMessage(std::vector<WhackAStoodentServer::MatchHistoryEntry>&& matchHistory) :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::EndGame>(),
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::EndGame>(),
 	matchHistory(matchHistory)
 {
 	// ...
@@ -58,7 +58,7 @@ const std::vector<WhackAStoodentServer::MatchHistoryEntry>& WhackAStoodentServer
 /// <returns>Serialized contents</returns>
 std::vector<std::uint8_t>& WhackAStoodentServer::Messages::EndGameMessage::Serialize(std::vector<std::uint8_t>& result) const
 {
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::EndGame>::Serialize(result);
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::EndGame>::Serialize(result);
 	return WhackAStoodentServer::CollectionSerializer::SerializeIntegerSizedCollection<WhackAStoodentServer::MatchHistoryEntry>(std::span<const WhackAStoodentServer::MatchHistoryEntry>(matchHistory.begin(), matchHistory.end()), result);
 }
 
@@ -69,6 +69,6 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::EndGameMessage::Seria
 /// <returns>Remaining data to deserialize</returns>
 std::span<const std::uint8_t> WhackAStoodentServer::Messages::EndGameMessage::Deserialize(const std::span<const std::uint8_t>& data)
 {
-	std::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::EndGame>::Deserialize(data));
-	return CollectionSerializer::DeserializeIntegerSizedCollection<WhackAStoodentServer::MatchHistoryEntry>(next_bytes, matchHistory);
+	std::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::EndGame>::Deserialize(data));
+	return WhackAStoodentServer::CollectionSerializer::DeserializeIntegerSizedCollection<WhackAStoodentServer::MatchHistoryEntry>(next_bytes, matchHistory);
 }

@@ -6,7 +6,7 @@
 /// Constructs an authenticate message
 /// </summary>
 WhackAStoodentServer::Messages::AuthenticateMessage::AuthenticateMessage() :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Authenticate>()
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Authenticate>()
 {
 	// ...
 }
@@ -17,7 +17,7 @@ WhackAStoodentServer::Messages::AuthenticateMessage::AuthenticateMessage() :
 /// <param name="userID">User ID</param>
 /// <param name="username">Username</param>
 WhackAStoodentServer::Messages::AuthenticateMessage::AuthenticateMessage(const uuids::uuid& userID, std::wstring_view username) :
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Authenticate>(),
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Authenticate>(),
 	userID(userID),
 	username(username)
 {
@@ -57,9 +57,9 @@ std::wstring_view WhackAStoodentServer::Messages::AuthenticateMessage::GetUserna
 /// <returns>Serialized contents</returns>
 std::vector<std::uint8_t>& WhackAStoodentServer::Messages::AuthenticateMessage::Serialize(std::vector<std::uint8_t>& result) const
 {
-	WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Authenticate>::Serialize(result);
-	UUIDs::SerializeUUID(userID, result);
-	return StringSerializer::Serialize<std::uint8_t>(username, result);
+	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Authenticate>::Serialize(result);
+	WhackAStoodentServer::UUIDs::SerializeUUID(userID, result);
+	return WhackAStoodentServer::StringSerializer::Serialize<std::uint8_t>(username, result);
 }
 
 /// <summary>
@@ -69,7 +69,7 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::AuthenticateMessage::
 /// <returns>Remaining data to deserialize</returns>
 std::span<const std::uint8_t> WhackAStoodentServer::Messages::AuthenticateMessage::Deserialize(const std::span<const std::uint8_t>& data)
 {
-	std::span<std::uint8_t const> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::Authenticate>::Deserialize(data));
-	next_bytes = UUIDs::DeserializeUUID(next_bytes, userID);
-	return StringSerializer::DeserializeByteSizedString(next_bytes, username);
+	std::span<std::uint8_t const> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Authenticate>::Deserialize(data));
+	next_bytes = WhackAStoodentServer::UUIDs::DeserializeUUID(next_bytes, userID);
+	return WhackAStoodentServer::StringSerializer::DeserializeByteSizedString(next_bytes, username);
 }

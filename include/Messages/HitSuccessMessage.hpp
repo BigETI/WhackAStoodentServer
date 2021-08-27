@@ -1,7 +1,8 @@
 #pragma once
 
+#include <cstdint>
+
 #include <Abstract/ASerializableMessage.hpp>
-#include <Enumerators/ELookHole.hpp>
 #include <Misc/Vector2D.hpp>
 
 /// <summary>
@@ -32,7 +33,7 @@ namespace WhackAStoodentServer
 			/// <param name="lookHole">Look hole</param>
 			/// <param name="points">Points</param>
 			/// <param name="position">Position</param>
-			HitSuccessMessage(ELookHole lookHole, std::int64_t points, const Vector2D<float>& position);
+			HitSuccessMessage(std::size_t lookHole, std::int64_t points, const Vector2D<float>& position);
 
 			/// <summary>
 			/// Destroys hit message
@@ -40,10 +41,10 @@ namespace WhackAStoodentServer
 			virtual ~HitSuccessMessage() override;
 
 			/// <summary>
-			/// Get the look hole
+			/// Gets the look hole
 			/// </summary>
 			/// <returns>Look hole</returns>
-			virtual ELookHole GetLookHole() const;
+			virtual std::size_t GetLookHole() const;
 
 			/// <summary>
 			/// Gets the points
@@ -76,7 +77,7 @@ namespace WhackAStoodentServer
 			/// <summary>
 			/// Look hole
 			/// </summary>
-			ELookHole lookHole;
+			std::size_t lookHole;
 
 			/// <summary>
 			/// Points
