@@ -4,6 +4,8 @@
 #include <memory>
 #include <utility>
 
+#include <uuid.h>
+
 #include <Enumerators/EPlayerRole.hpp>
 #include <Misc/Event.hpp>
 #include <Misc/Hole.hpp>
@@ -27,8 +29,14 @@ namespace WhackAStoodentServer
 		/// </summary>
 		static const std::array<const Hole, 4ULL> Holes;
 
+		/// <summary>
+		/// Used to invoke when game has been started
+		/// </summary>
 		Event<> OnGameStarted;
 
+		/// <summary>
+		/// Used to invoke when game has been stopped
+		/// </summary>
 		Event<> OnGameStopped;
 
 		Game() = delete;
@@ -36,9 +44,10 @@ namespace WhackAStoodentServer
 		/// <summary>
 		/// Constructs a game
 		/// </summary>
-		/// <param name="hitterUser">User (hitter)(</param>
-		/// <param name="moleUser">User (mole)(</param>
-		Game(std::shared_ptr<User> hitterUser, std::shared_ptr<User> moleUser);
+		/// <param name="gameID">Game ID</param>
+		/// <param name="hitterUser">User (hitter)</param>
+		/// <param name="moleUser">User (mole)</param>
+		Game(const uuids::uuid& gameID, std::shared_ptr<User> hitterUser, std::shared_ptr<User> moleUser);
 
 		/// <summary>
 		/// Destroys game
@@ -46,25 +55,35 @@ namespace WhackAStoodentServer
 		virtual ~Game();
 
 		/// <summary>
+		/// Gets the game ID
+		/// </summary>
+		/// <returns>Game ID</returns>
+		virtual const uuids::uuid& GetGameID() const;
+
+		/// <summary>
 		/// Is game loaded
 		/// </summary>
 		/// <param name="role">Role</param>
+		/// <returns>"true" if game is loaded, otherwise "false"</returns>
 		virtual bool IsGameLoaded(EPlayerRole role) const;
 
 		/// <summary>
 		/// Is game loaded for user
 		/// </summary>
 		/// <param name="user">User</param>
+		/// <returns>"true" if game is loaded, otherwise "false"</returns>
 		virtual bool IsGameLoadedForUser(std::shared_ptr<User> user) const;
 
 		/// <summary>
 		/// Are games loaded
 		/// </summary>
+		/// <returns>"true" if games are loaded, otherwise "false"</returns>
 		virtual bool AreGamesLoaded() const;
 
 		/// <summary>
 		/// Is game running
 		/// </summary>
+		/// <returns>"true" if game is running, otherwise "false"</returns>
 		virtual bool IsGameRunning() const;
 
 		/// <summary>
@@ -76,11 +95,13 @@ namespace WhackAStoodentServer
 		/// <summary>
 		/// Stops game
 		/// </summary>
+		/// <returns>"true" if game has been successfully stopped, otherwise "false"</returns>
 		virtual bool StopGame();
 
 		/// <summary>
-		/// Gets player role
+		/// Gets the player role
 		/// </summary>
+		/// <returns>Player role</returns>
 		virtual EPlayerRole GetPlayerRole(std::shared_ptr<User> user) const;
 
 		/// <summary>
@@ -109,6 +130,11 @@ namespace WhackAStoodentServer
 		virtual void ProcessTick(double deltaTime);
 
 	private:
+
+		/// <summary>
+		/// Game ID
+		/// </summary>
+		uuids::uuid gameID;
 
 		/// <summary>
 		/// Hitter user

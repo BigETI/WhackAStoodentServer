@@ -6,7 +6,9 @@
 #include <Messages/RequestPlayMessage.hpp>
 #include <Messages/StartedGameMessage.hpp>
 #include <Misc/Lobby.hpp>
+#include <Static/Rules.hpp>
 #include <Static/SessionCodes.hpp>
+#include <Static/UUIDs.hpp>
 
 /// <summary>
 /// Constructs a lobby
@@ -99,7 +101,12 @@ bool WhackAStoodentServer::Lobby::RemoveUser(std::shared_ptr<WhackAStoodentServe
 		gameSearchingUsers.remove(user);
 		sessionCodeToUserLookup.erase(std::string(user->GetSessionCode()));
 		userIDToUserLookup.erase(user->GetUserID());
-		// TODO: Do something with the running game of the specified user.
+		std::shared_ptr<WhackAStoodentServer::Game> game;
+		if (TryGetUserGame(user, game))
+		{
+			game->StopGame();
+			games.erase(game->GetGameID());
+		}
 	}
 	return ret;
 }
@@ -246,7 +253,7 @@ bool WhackAStoodentServer::Lobby::AddUserToSearch(std::shared_ptr<WhackAStoodent
 	if (ret)
 	{
 		bool is_added_to_search(true);
-		for (std::shared_ptr<WhackAStoodentServer::User> game_searching_user : gameSearchingUsers)
+		for (const std::shared_ptr<User>& game_searching_user : gameSearchingUsers)
 		{
 			if ((game_searching_user != user) && !game_searching_user->IsUserBlocked(user) && user->IsUserBlocked(game_searching_user))
 			{
@@ -291,7 +298,7 @@ bool WhackAStoodentServer::Lobby::IsUserSearchingForAGame(std::shared_ptr<WhackA
 		throw std::invalid_argument("Parameter \"user\" is not valid.");
 	}
 	bool ret(false);
-	for (std::shared_ptr<WhackAStoodentServer::User> game_searching_user : gameSearchingUsers)
+	for (const std::shared_ptr<WhackAStoodentServer::User>& game_searching_user : gameSearchingUsers)
 	{
 		if (game_searching_user == user)
 		{
@@ -331,19 +338,19 @@ bool WhackAStoodentServer::Lobby::RequestForPlaying(std::shared_ptr<WhackAStoode
 			auto opposing_users_requesting_play_iterator = usersRequestingPlay.find(opposingUser->GetUserID());
 			if (opposing_users_requesting_play_iterator == usersRequestingPlay.end())
 			{
-				usersRequestingPlay.insert_or_assign(issuingUser->GetUserID(), std::make_pair(issuingUser, opposingUser));
-				usersRequestingPlay.insert_or_assign(opposingUser->GetUserID(), std::make_pair(opposingUser, issuingUser));
+				usersRequestingPlay.insert_or_assign(issuingUser->GetUserID(), std::make_tuple(issuingUser, opposingUser, std::chrono::high_resolution_clock::now()));
+				usersRequestingPlay.insert_or_assign(opposingUser->GetUserID(), std::make_tuple(opposingUser, issuingUser, std::chrono::high_resolution_clock::now()));
 				usersRequestingPlay.erase(opposing_users_requesting_play_iterator);
 				opposingUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::RequestPlayMessage>(issuingUser->GetSessionCode(), issuingUser->GetUsername());
 			}
 			else
 			{
-				DenyPlayRequestInternal(opposing_users_requesting_play_iterator, EDenyPlayRequestReason::NotInterested);
+				DenyPlayRequestInternal(opposing_users_requesting_play_iterator, WhackAStoodentServer::EDenyPlayRequestReason::NotInterested);
 			}
 		}
 		else
 		{
-			issuingUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::ErrorMessage>(WhackAStoodentServer::EErrorType::InvalidMessageContext, (users_requesting_play_iterator->second.second == opposingUser) ? L"You have already requested play with the same user." : L"You already have requested play with someone else.");
+			issuingUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::ErrorMessage>(WhackAStoodentServer::EErrorType::InvalidMessageContext, (std::get<static_cast<std::size_t>(1)>(users_requesting_play_iterator->second) == opposingUser) ? L"You have already requested play with the same user." : L"You already have requested play with someone else.");
 		}
 	}
 	return ret;
@@ -364,7 +371,7 @@ bool WhackAStoodentServer::Lobby::AcceptPlayRequest(std::shared_ptr<WhackAStoode
 	bool ret(users_requesting_play_iterator != usersRequestingPlay.end());
 	if (ret)
 	{
-		std::shared_ptr<WhackAStoodentServer::User> opposing_user(users_requesting_play_iterator->second.second);
+		std::shared_ptr<WhackAStoodentServer::User> opposing_user(std::get<static_cast<std::size_t>(1)>(users_requesting_play_iterator->second));
 		usersRequestingPlay.erase(opposing_user->GetUserID());
 		usersRequestingPlay.erase(users_requesting_play_iterator);
 		CreateGame(user, opposing_user);
@@ -442,6 +449,21 @@ void WhackAStoodentServer::Lobby::ProcessTick(double deltaTime)
 	{
 		game.second->ProcessTick(deltaTime);
 	}
+	std::unordered_map<uuids::uuid, std::tuple<std::shared_ptr<User>, std::shared_ptr<User>, std::chrono::high_resolution_clock::time_point>> remove_users_requesting_play;
+	for (const auto& users_requesting_play : usersRequestingPlay)
+	{
+		std::chrono::milliseconds elapsed_time(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - std::get<static_cast<std::size_t>(2)>(users_requesting_play.second)));
+		if (elapsed_time >= WhackAStoodentServer::Rules::MaximalWaitForGameRequestTime)
+		{
+			remove_users_requesting_play.insert_or_assign(users_requesting_play.first, users_requesting_play.second);
+		}
+	}
+	for (const auto& remove_user_requesting_play : remove_users_requesting_play)
+	{
+		usersRequestingPlay.erase(remove_user_requesting_play.first);
+		std::get<static_cast<std::size_t>(0)>(remove_user_requesting_play.second)->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::DenyPlayRequestMessage>(WhackAStoodentServer::EDenyPlayRequestReason::NotInterested);
+		std::get<static_cast<std::size_t>(1)>(remove_user_requesting_play.second)->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::DenyPlayRequestMessage>(WhackAStoodentServer::EDenyPlayRequestReason::NotInterested);
+	}
 }
 
 /// <summary>
@@ -449,10 +471,10 @@ void WhackAStoodentServer::Lobby::ProcessTick(double deltaTime)
 /// </summary>
 /// <param name="usersRequestingPlayIterator">Users requesting play iterator</param>
 /// <param name="reason">Reason</param>
-void WhackAStoodentServer::Lobby::DenyPlayRequestInternal(std::unordered_map<uuids::uuid, std::pair<std::shared_ptr<WhackAStoodentServer::User>, std::shared_ptr<WhackAStoodentServer::User>>>::iterator usersRequestingPlayIterator, WhackAStoodentServer::EDenyPlayRequestReason reason)
+void WhackAStoodentServer::Lobby::DenyPlayRequestInternal(std::unordered_map<uuids::uuid, std::tuple<std::shared_ptr<WhackAStoodentServer::User>, std::shared_ptr<WhackAStoodentServer::User>, std::chrono::high_resolution_clock::time_point>>::iterator usersRequestingPlayIterator, WhackAStoodentServer::EDenyPlayRequestReason reason)
 {
-	std::shared_ptr<WhackAStoodentServer::User> user(usersRequestingPlayIterator->second.first);
-	usersRequestingPlay.erase(usersRequestingPlayIterator->second.second->GetUserID());
+	std::shared_ptr<WhackAStoodentServer::User> user(std::get<static_cast<std::size_t>(0)>(usersRequestingPlayIterator->second));
+	usersRequestingPlay.erase(std::get<static_cast<std::size_t>(1)>(usersRequestingPlayIterator->second)->GetUserID());
 	usersRequestingPlay.erase(usersRequestingPlayIterator);
 	user->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::DenyPlayRequestMessage>(reason);
 }
@@ -467,6 +489,9 @@ void WhackAStoodentServer::Lobby::CreateGame(std::shared_ptr<WhackAStoodentServe
 	bool is_swapped(!(random() & 0x1U));
 	std::shared_ptr<WhackAStoodentServer::User> hitter_user(is_swapped ? secondUser : firstUser);
 	std::shared_ptr<WhackAStoodentServer::User> mole_user(is_swapped ? firstUser : secondUser);
+	uuids::uuid game_id;
+	while (games.contains(WhackAStoodentServer::UUIDs::CreateNewUUID(game_id)));
+	games.insert_or_assign(game_id, std::make_shared<WhackAStoodentServer::Game>(game_id, hitter_user, mole_user));
 	hitter_user->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::StartedGameMessage>(WhackAStoodentServer::EPlayerRole::Hitter, mole_user->GetUsername());
 	mole_user->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::StartedGameMessage>(WhackAStoodentServer::EPlayerRole::Mole, hitter_user->GetUsername());
 }

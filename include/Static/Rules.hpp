@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 
@@ -24,6 +25,11 @@ namespace WhackAStoodentServer
 		/// Session code character count
 		/// </summary>
 		static constexpr const std::size_t SessionCodeCharacterCount = static_cast<const std::size_t>(6);
+
+		/// <summary>
+		/// Maximal wait for game request time
+		/// </summary>
+		static constexpr const std::chrono::seconds MaximalWaitForGameRequestTime = static_cast<std::chrono::seconds>(20);
 
 		/// <summary>
 		/// Hitting score

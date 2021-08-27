@@ -5,6 +5,9 @@
 #include <Misc/Game.hpp>
 #include <Static/Rules.hpp>
 
+/// <summary>
+/// Holes
+/// </summary>
 const std::array<const WhackAStoodentServer::Hole, 4ULL> WhackAStoodentServer::Game::Holes =
 {
 	WhackAStoodentServer::Hole(WhackAStoodentServer::Vector2D<float>(-4.627595f, -2.85f), WhackAStoodentServer::Vector2D<float>(4.11071f, 2.26f)),
@@ -16,15 +19,21 @@ const std::array<const WhackAStoodentServer::Hole, 4ULL> WhackAStoodentServer::G
 /// <summary>
 /// Constructs a game
 /// </summary>
-/// <param name="hitterUser">User (hitter)(</param>
-/// <param name="moleUser">User (mole)(</param>
-WhackAStoodentServer::Game::Game(std::shared_ptr<WhackAStoodentServer::User> hitterUser, std::shared_ptr<WhackAStoodentServer::User> moleUser) :
+/// <param name="gameID">Game ID</param>
+/// <param name="hitterUser">User (hitter)</param>
+/// <param name="moleUser">User (mole)</param>
+WhackAStoodentServer::Game::Game(const uuids::uuid& gameID, std::shared_ptr<WhackAStoodentServer::User> hitterUser, std::shared_ptr<WhackAStoodentServer::User> moleUser) :
+	gameID(gameID),
 	hitterUser(std::make_pair(hitterUser, false)),
 	moleUser(std::make_pair(moleUser, false)),
 	isGameRunning(false),
 	gameStartedTimePoint(std::chrono::high_resolution_clock::now()),
 	lookingHoleIndex(-1)
 {
+	if (gameID.is_nil())
+	{
+		throw std::invalid_argument("Parameter \"gameID\" is nil.");
+	}
 	if (!hitterUser)
 	{
 		throw std::invalid_argument("Parameter \"hitterUser\" is null.");
@@ -48,9 +57,19 @@ WhackAStoodentServer::Game::~Game()
 }
 
 /// <summary>
+/// Gets the game ID
+/// </summary>
+/// <returns>Game ID</returns>
+const uuids::uuid& WhackAStoodentServer::Game::GetGameID() const
+{
+	return gameID;
+}
+
+/// <summary>
 /// Is game loaded
 /// </summary>
 /// <param name="role">Role</param>
+/// <returns>"true" if game is loaded, otherwise "false"</returns>
 bool WhackAStoodentServer::Game::IsGameLoaded(WhackAStoodentServer::EPlayerRole role) const
 {
 	return (role == WhackAStoodentServer::EPlayerRole::Hitter) ? hitterUser.second : moleUser.second;
@@ -60,6 +79,7 @@ bool WhackAStoodentServer::Game::IsGameLoaded(WhackAStoodentServer::EPlayerRole 
 /// Is game loaded for user
 /// </summary>
 /// <param name="user">User</param>
+/// <returns>"true" if game is loaded, otherwise "false"</returns>
 bool WhackAStoodentServer::Game::IsGameLoadedForUser(std::shared_ptr<WhackAStoodentServer::User> user) const
 {
 	return IsGameLoaded(GetPlayerRole(user));
@@ -68,6 +88,7 @@ bool WhackAStoodentServer::Game::IsGameLoadedForUser(std::shared_ptr<WhackAStood
 /// <summary>
 /// Are games loaded
 /// </summary>
+/// <returns>"true" if games are loaded, otherwise "false"</returns>
 bool WhackAStoodentServer::Game::AreGamesLoaded() const
 {
 	return hitterUser.second && moleUser.second;
@@ -76,6 +97,7 @@ bool WhackAStoodentServer::Game::AreGamesLoaded() const
 /// <summary>
 /// Is game running
 /// </summary>
+/// <returns>"true" if game is running, otherwise "false"</returns>
 bool WhackAStoodentServer::Game::IsGameRunning() const
 {
 	return isGameRunning;
@@ -100,6 +122,7 @@ bool WhackAStoodentServer::Game::StartGame()
 /// <summary>
 /// Stops game
 /// </summary>
+/// <returns>"true" if game has been successfully stopped, otherwise "false"</returns>
 bool WhackAStoodentServer::Game::StopGame()
 {
 	bool ret(isGameRunning);
@@ -112,8 +135,9 @@ bool WhackAStoodentServer::Game::StopGame()
 }
 
 /// <summary>
-/// Gets player role
+/// Gets the player role
 /// </summary>
+/// <returns>Player role</returns>
 WhackAStoodentServer::EPlayerRole WhackAStoodentServer::Game::GetPlayerRole(std::shared_ptr<WhackAStoodentServer::User> user) const
 {
 	if (!user)

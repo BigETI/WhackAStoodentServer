@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <cstdint>
 #include <memory>
 #include <list>
@@ -239,7 +240,7 @@ namespace WhackAStoodentServer
 		/// <summary>
 		/// Users requesting play
 		/// </summary>
-		std::unordered_map<uuids::uuid, std::pair<std::shared_ptr<User>, std::shared_ptr<User>>> usersRequestingPlay;
+		std::unordered_map<uuids::uuid, std::tuple<std::shared_ptr<User>, std::shared_ptr<User>, std::chrono::high_resolution_clock::time_point>> usersRequestingPlay;
 
 		/// <summary>
 		/// Games
@@ -261,7 +262,7 @@ namespace WhackAStoodentServer
 		/// </summary>
 		/// <param name="usersRequestingPlayIterator">Users requesting play iterator</param>
 		/// <param name="reason">Reason</param>
-		void DenyPlayRequestInternal(std::unordered_map<uuids::uuid, std::pair<std::shared_ptr<User>, std::shared_ptr<User>>>::iterator usersRequestingPlayIterator, EDenyPlayRequestReason reason);
+		void DenyPlayRequestInternal(std::unordered_map<uuids::uuid, std::tuple<std::shared_ptr<User>, std::shared_ptr<User>, std::chrono::high_resolution_clock::time_point>>::iterator usersRequestingPlayIterator, EDenyPlayRequestReason reason);
 
 		/// <summary>
 		/// Creates a new game
