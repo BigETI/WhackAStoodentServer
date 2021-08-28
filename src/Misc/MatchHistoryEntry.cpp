@@ -7,7 +7,9 @@
 /// </summary>
 WhackAStoodentServer::MatchHistoryEntry::MatchHistoryEntry() :
 	yourScore(static_cast<std::int64_t>(0)),
-	opponentScore(static_cast<std::int64_t>(0))
+	yourRole(WhackAStoodentServer::EPlayerRole::Hitter),
+	opponentScore(static_cast<std::int64_t>(0)),
+	opponentRole(WhackAStoodentServer::EPlayerRole::Mole)
 {
 	// ...
 }
@@ -18,8 +20,10 @@ WhackAStoodentServer::MatchHistoryEntry::MatchHistoryEntry() :
 /// <param name="matchHistoryEntry">Match history entry</param>
 WhackAStoodentServer::MatchHistoryEntry::MatchHistoryEntry(const WhackAStoodentServer::MatchHistoryEntry& matchHistoryEntry) :
 	yourScore(matchHistoryEntry.yourScore),
+	yourRole(matchHistoryEntry.yourRole),
 	yourName(matchHistoryEntry.yourName),
 	opponentScore(matchHistoryEntry.opponentScore),
+	opponentRole(matchHistoryEntry.opponentRole),
 	opponentName(matchHistoryEntry.opponentName)
 {
 	// ...
@@ -31,8 +35,10 @@ WhackAStoodentServer::MatchHistoryEntry::MatchHistoryEntry(const WhackAStoodentS
 /// <param name="matchHistoryEntry">Match history entry</param>
 WhackAStoodentServer::MatchHistoryEntry::MatchHistoryEntry(WhackAStoodentServer::MatchHistoryEntry&& matchHistoryEntry) :
 	yourScore(matchHistoryEntry.yourScore),
+	yourRole(matchHistoryEntry.yourRole),
 	yourName(matchHistoryEntry.yourName),
 	opponentScore(matchHistoryEntry.opponentScore),
+	opponentRole(matchHistoryEntry.opponentRole),
 	opponentName(matchHistoryEntry.opponentName)
 {
 	// ...
@@ -42,13 +48,17 @@ WhackAStoodentServer::MatchHistoryEntry::MatchHistoryEntry(WhackAStoodentServer:
 /// Constructs a match history entry
 /// </summary>
 /// <param name="yourScore">Your score</param>
+/// <param name="yourRole">Your role</param>
 /// <param name="yourName">Your name</param>
-/// <param name="opponentScore">Opponent's name</param>
+/// <param name="opponentScore">Opponent's score</param>
+/// <param name="opponentRole">Opponent's role</param>
 /// <param name="opponentName">Opponent's name</param>
-WhackAStoodentServer::MatchHistoryEntry::MatchHistoryEntry(std::int64_t yourScore, std::wstring_view yourName, std::int64_t opponentScore, std::wstring_view opponentName) :
+WhackAStoodentServer::MatchHistoryEntry::MatchHistoryEntry(std::int64_t yourScore, WhackAStoodentServer::EPlayerRole yourRole, std::wstring_view yourName, std::int64_t opponentScore, WhackAStoodentServer::EPlayerRole opponentRole, std::wstring_view opponentName) :
 	yourScore(yourScore),
+	yourRole(yourRole),
 	yourName(yourName),
 	opponentScore(opponentScore),
+	opponentRole(opponentRole),
 	opponentName(opponentName)
 {
 	// ...
@@ -72,6 +82,15 @@ std::int64_t WhackAStoodentServer::MatchHistoryEntry::GetYourScore() const
 }
 
 /// <summary>
+/// Gets your role
+/// </summary>
+/// <returns>Your role</returns>
+WhackAStoodentServer::EPlayerRole WhackAStoodentServer::MatchHistoryEntry::GetYourRole() const
+{
+	return yourRole;
+}
+
+/// <summary>
 /// Gets your name
 /// </summary>
 /// <returns>Your name</returns>
@@ -87,6 +106,15 @@ std::wstring_view WhackAStoodentServer::MatchHistoryEntry::GetYourName() const
 std::int64_t WhackAStoodentServer::MatchHistoryEntry::GetOpponentScore() const
 {
 	return opponentScore;
+}
+
+/// <summary>
+/// Gets opponent's role
+/// </summary>
+/// <returns>Opponent's role</returns>
+WhackAStoodentServer::EPlayerRole WhackAStoodentServer::MatchHistoryEntry::GetOpponentRole() const
+{
+	return opponentRole;
 }
 
 /// <summary>
@@ -106,8 +134,10 @@ std::wstring_view WhackAStoodentServer::MatchHistoryEntry::GetOpponentName() con
 std::vector<std::uint8_t>& WhackAStoodentServer::MatchHistoryEntry::Serialize(std::vector<std::uint8_t>& result) const
 {
 	NumericSerializer::SerializeLong(yourScore, result);
+	NumericSerializer::SerializeByte(static_cast<std::uint8_t>(yourRole), result);
 	StringSerializer::SerializeByteSizedString(yourName, result);
 	NumericSerializer::SerializeLong(opponentScore, result);
+	NumericSerializer::SerializeByte(static_cast<std::uint8_t>(opponentRole), result);
 	return StringSerializer::SerializeByteSizedString(opponentName, result);
 }
 
@@ -118,9 +148,14 @@ std::vector<std::uint8_t>& WhackAStoodentServer::MatchHistoryEntry::Serialize(st
 /// <returns>Remaining data to deserialize</returns>
 std::span<std::uint8_t const> WhackAStoodentServer::MatchHistoryEntry::Deserialize(const std::span<std::uint8_t const>& data)
 {
+	std::uint8_t role;
 	std::span<std::uint8_t const> next_bytes(NumericSerializer::DeserializeLong(data, yourScore));
+	next_bytes = NumericSerializer::DeserializeByte(next_bytes, role);
+	yourRole = static_cast<WhackAStoodentServer::EPlayerRole>(role);
 	next_bytes = StringSerializer::DeserializeByteSizedString(next_bytes, yourName);
 	next_bytes = NumericSerializer::DeserializeLong(next_bytes, opponentScore);
+	next_bytes = NumericSerializer::DeserializeByte(next_bytes, role);
+	opponentRole = static_cast<WhackAStoodentServer::EPlayerRole>(role);
 	return StringSerializer::DeserializeByteSizedString(next_bytes, opponentName);
 }
 

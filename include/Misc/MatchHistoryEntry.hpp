@@ -4,6 +4,7 @@
 #include <string>
 #include <string_view>
 
+#include <Enumerators/EPlayerRole.hpp>
 #include <Interfaces/ISerializable.hpp>
 
 /// <summary>
@@ -39,10 +40,12 @@ namespace WhackAStoodentServer
 		/// Constructs a match history entry
 		/// </summary>
 		/// <param name="yourScore">Your score</param>
+		/// <param name="yourRole">Your role</param>
 		/// <param name="yourName">Your name</param>
-		/// <param name="opponentScore">Opponent's name</param>
+		/// <param name="opponentScore">Opponent's score</param>
+		/// <param name="opponentRole">Opponent's role</param>
 		/// <param name="opponentName">Opponent's name</param>
-		MatchHistoryEntry(std::int64_t yourScore, std::wstring_view yourName, std::int64_t opponentScore, std::wstring_view opponentName);
+		MatchHistoryEntry(std::int64_t yourScore, EPlayerRole yourRole, std::wstring_view yourName, std::int64_t opponentScore, EPlayerRole opponentRole, std::wstring_view opponentName);
 
 		/// <summary>
 		/// Destroys match history entry
@@ -56,6 +59,12 @@ namespace WhackAStoodentServer
 		virtual std::int64_t GetYourScore() const;
 
 		/// <summary>
+		/// Gets your role
+		/// </summary>
+		/// <returns>Your role</returns>
+		virtual WhackAStoodentServer::EPlayerRole GetYourRole() const;
+
+		/// <summary>
 		/// Gets your name
 		/// </summary>
 		/// <returns>Your name</returns>
@@ -66,6 +75,12 @@ namespace WhackAStoodentServer
 		/// </summary>
 		/// <returns>Opponent's score</returns>
 		virtual std::int64_t GetOpponentScore() const;
+
+		/// <summary>
+		/// Gets opponent's role
+		/// </summary>
+		/// <returns>Opponent's role</returns>
+		virtual WhackAStoodentServer::EPlayerRole GetOpponentRole() const;
 
 		/// <summary>
 		/// Gets the opponent's name
@@ -109,6 +124,11 @@ namespace WhackAStoodentServer
 		std::int64_t yourScore;
 
 		/// <summary>
+		/// Your role
+		/// </summary>
+		WhackAStoodentServer::EPlayerRole yourRole;
+
+		/// <summary>
 		/// Your name
 		/// </summary>
 		std::wstring yourName;
@@ -117,6 +137,11 @@ namespace WhackAStoodentServer
 		/// Opponent's score
 		/// </summary>
 		std::int64_t opponentScore;
+
+		/// <summary>
+		/// Opponent's role
+		/// </summary>
+		WhackAStoodentServer::EPlayerRole opponentRole;
 
 		/// <summary>
 		/// Opponent's name

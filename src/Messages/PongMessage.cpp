@@ -15,7 +15,7 @@ WhackAStoodentServer::Messages::PongMessage::PongMessage() :
 /// Constructs a pong message
 /// </summary>
 /// <param name="pongData">Pong data</param>
-WhackAStoodentServer::Messages::PongMessage::PongMessage(int32_t pongData) :
+WhackAStoodentServer::Messages::PongMessage::PongMessage(std::int32_t pongData) :
 	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Pong>(),
 	pongData(pongData)
 {

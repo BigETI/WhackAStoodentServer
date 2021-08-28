@@ -30,7 +30,7 @@ namespace WhackAStoodentServer
 			/// Constructs a pong message
 			/// </summary>
 			/// <param name="pongData">Pong data</param>
-			PongMessage(int32_t pongData);
+			PongMessage(std::int32_t pongData);
 
 			/// <summary>
 			/// Destroys pong message
