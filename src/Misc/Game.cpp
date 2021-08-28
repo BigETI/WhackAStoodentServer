@@ -2,6 +2,7 @@
 #include <Messages/HitFailMessage.hpp>
 #include <Messages/HitSuccessMessage.hpp>
 #include <Messages/LookMessage.hpp>
+#include <Messages/ScoreMoleMessage.hpp>
 #include <Misc/Game.hpp>
 #include <Static/Rules.hpp>
 
@@ -104,6 +105,15 @@ bool WhackAStoodentServer::Game::IsGameRunning() const
 }
 
 /// <summary>
+/// Is game finished
+/// </summary>
+/// <returns>"true" if game is finished, otherwise "false"</returns>
+bool WhackAStoodentServer::Game::IsGameFinished() const
+{
+	return isGameFinished;
+}
+
+/// <summary>
 /// Starts game
 /// </summary>
 /// <returns>"true" if game has been successfully started, otherwise "false"</returns>
@@ -114,21 +124,26 @@ bool WhackAStoodentServer::Game::StartGame()
 	{
 		gameStartedTimePoint = std::chrono::high_resolution_clock::now();
 		isGameRunning = true;
+		hitterUser.first->SetScore(0L);
+		moleUser.first->SetScore(0L);
 		OnGameStarted();
 	}
 	return ret;
 }
 
 /// <summary>
-/// Stops game
+/// Finishes game
 /// </summary>
 /// <returns>"true" if game has been successfully stopped, otherwise "false"</returns>
-bool WhackAStoodentServer::Game::StopGame()
+bool WhackAStoodentServer::Game::FinishGame()
 {
 	bool ret(isGameRunning);
 	if (ret)
 	{
 		isGameRunning = false;
+		isGameFinished = true;
+		hitterUser.first->SetGameLoadedState(false);
+		moleUser.first->SetGameLoadedState(false);
 		OnGameStopped();
 	}
 	return ret;
@@ -167,10 +182,11 @@ WhackAStoodentServer::EPlayerRole WhackAStoodentServer::Game::GetPlayerRole(std:
 /// <returns>"true" if hitting was successful, otherwise "false"</returns>
 bool WhackAStoodentServer::Game::Hit(const WhackAStoodentServer::Vector2D<float>& position)
 {
-	bool ret((lookingHoleIndex >= 0) && Holes[lookingHoleIndex].IsPositionInHole(position));
+	bool ret((lookingHoleIndex >= 0) && ((std::chrono::high_resolution_clock::now() - lastHitTimePoint) >= WhackAStoodentServer::Rules::HittingCooldownTime) && Holes[lookingHoleIndex].IsPositionInHole(position));
 	if (ret)
 	{
 		std::int64_t new_score(hitterUser.first->GetScore() + WhackAStoodentServer::Rules::HittingScore);
+		lookingHoleIndex = -1;
 		hitterUser.first->SetScore(new_score);
 		hitterUser.first->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HitSuccessMessage>(static_cast<std::size_t>(lookingHoleIndex), new_score, position);
 		moleUser.first->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HitSuccessMessage>(static_cast<std::size_t>(lookingHoleIndex), new_score, position);
@@ -198,6 +214,7 @@ bool WhackAStoodentServer::Game::Look(std::size_t holeIndex)
 	if (ret)
 	{
 		lookingHoleIndex = static_cast<int>(holeIndex);
+		lastLookingTickTimePoint = std::chrono::high_resolution_clock::now();
 		hitterUser.first->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::LookMessage>(holeIndex);
 		moleUser.first->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::LookMessage>(holeIndex);
 	}
@@ -223,10 +240,31 @@ bool WhackAStoodentServer::Game::Hide()
 /// <summary>
 /// Processes tick
 /// </summary>
-void WhackAStoodentServer::Game::ProcessTick(double deltaTime)
+void WhackAStoodentServer::Game::ProcessTick()
 {
 	if (isGameRunning)
 	{
-		// TODO: Perform game logic
+		if ((std::chrono::high_resolution_clock::now() - gameStartedTimePoint) < WhackAStoodentServer::Rules::PlayTime)
+		{
+			if (lookingHoleIndex >= 0)
+			{
+				std::chrono::nanoseconds elapsed_look_tick_time(std::chrono::high_resolution_clock::now() - lastLookingTickTimePoint);
+				bool is_sending_mole_scored_message(false);
+				while (elapsed_look_tick_time >= WhackAStoodentServer::Rules::LookingTickTime)
+				{
+					elapsed_look_tick_time -= WhackAStoodentServer::Rules::LookingTickTime;
+					moleUser.first->SetScore(moleUser.first->GetScore() + WhackAStoodentServer::Rules::LookingScorePerLookingTick);
+					is_sending_mole_scored_message = true;
+				}
+				if (is_sending_mole_scored_message)
+				{
+					hitterUser.first->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::ScoreMoleMessage>(moleUser.first->GetScore());
+				}
+			}
+		}
+		else
+		{
+			FinishGame();
+		}
 	}
 }

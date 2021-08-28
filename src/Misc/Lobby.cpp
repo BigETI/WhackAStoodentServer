@@ -95,7 +95,7 @@ bool WhackAStoodentServer::Lobby::RemoveUser(std::shared_ptr<WhackAStoodentServe
 		auto user_id_to_game_lookup_iterator(userIDToGameLookup.find(user->GetUserID()));
 		if (user_id_to_game_lookup_iterator != userIDToGameLookup.end())
 		{
-			user_id_to_game_lookup_iterator->second->StopGame();
+			user_id_to_game_lookup_iterator->second->FinishGame();
 			userIDToGameLookup.erase(user_id_to_game_lookup_iterator);
 		}
 		gameSearchingUsers.remove(user);
@@ -104,7 +104,7 @@ bool WhackAStoodentServer::Lobby::RemoveUser(std::shared_ptr<WhackAStoodentServe
 		std::shared_ptr<WhackAStoodentServer::Game> game;
 		if (TryGetUserGame(user, game))
 		{
-			game->StopGame();
+			game->FinishGame();
 			games.erase(game->GetGameID());
 		}
 	}
@@ -442,14 +442,22 @@ std::shared_ptr<WhackAStoodentServer::Game> WhackAStoodentServer::Lobby::GetUser
 /// <summary>
 /// Processes tick
 /// </summary>
-/// <param name="deltaTime">Delta time</param>
-void WhackAStoodentServer::Lobby::ProcessTick(double deltaTime)
+void WhackAStoodentServer::Lobby::ProcessTick()
 {
+	std::unordered_set<uuids::uuid> remove_games;
+	std::unordered_map<uuids::uuid, std::tuple<std::shared_ptr<User>, std::shared_ptr<User>, std::chrono::high_resolution_clock::time_point>> remove_users_requesting_play;
 	for (auto game : games)
 	{
-		game.second->ProcessTick(deltaTime);
+		game.second->ProcessTick();
+		if (game.second->IsGameFinished())
+		{
+			remove_games.insert(game.first);
+		}
 	}
-	std::unordered_map<uuids::uuid, std::tuple<std::shared_ptr<User>, std::shared_ptr<User>, std::chrono::high_resolution_clock::time_point>> remove_users_requesting_play;
+	for (const auto& remove_game : remove_games)
+	{
+		games.erase(remove_game);
+	}
 	for (const auto& users_requesting_play : usersRequestingPlay)
 	{
 		std::chrono::milliseconds elapsed_time(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - std::get<static_cast<std::size_t>(2)>(users_requesting_play.second)));

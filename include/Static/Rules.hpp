@@ -32,9 +32,29 @@ namespace WhackAStoodentServer
 		static constexpr const std::chrono::seconds MaximalWaitForGameRequestTime = static_cast<std::chrono::seconds>(20);
 
 		/// <summary>
+		/// Play time
+		/// </summary>
+		static constexpr const std::chrono::minutes PlayTime = static_cast<const std::chrono::minutes>(3);
+
+		/// <summary>
 		/// Hitting score
 		/// </summary>
 		static constexpr const std::int64_t HittingScore = static_cast<const std::int64_t>(1);
+
+		/// <summary>
+		/// Looking tick time
+		/// </summary>
+		static constexpr const std::chrono::milliseconds HittingCooldownTime = static_cast<const std::chrono::milliseconds>(800);
+
+		/// <summary>
+		/// Looking score per looking tick
+		/// </summary>
+		static constexpr const std::int64_t LookingScorePerLookingTick = static_cast<const std::int64_t>(1);
+
+		/// <summary>
+		/// Looking tick time
+		/// </summary>
+		static constexpr const std::chrono::milliseconds LookingTickTime = static_cast<const std::chrono::milliseconds>(500);
 
 		Rules() = delete;
 		Rules(const Rules&) = delete;

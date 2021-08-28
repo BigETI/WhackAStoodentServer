@@ -504,6 +504,10 @@ bool WhackAStoodentServer::Server::ProcessMessages()
 			ret = (host_service_result >= 0);
 		}
 	}
+	if (ret)
+	{
+		lobby.ProcessTick();
+	}
 	return ret;
 }
 

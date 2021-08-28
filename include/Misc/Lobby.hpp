@@ -209,8 +209,7 @@ namespace WhackAStoodentServer
 		/// <summary>
 		/// Processes tick
 		/// </summary>
-		/// <param name="deltaTime">Delta time</param>
-		virtual void ProcessTick(double deltaTime);
+		virtual void ProcessTick();
 
 		Lobby& operator=(const Lobby&) = delete;
 		Lobby& operator=(Lobby&&) = delete;

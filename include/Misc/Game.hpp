@@ -87,16 +87,22 @@ namespace WhackAStoodentServer
 		virtual bool IsGameRunning() const;
 
 		/// <summary>
+		/// Is game finished
+		/// </summary>
+		/// <returns>"true" if game is finished, otherwise "false"</returns>
+		virtual bool IsGameFinished() const;
+
+		/// <summary>
 		/// Starts game
 		/// </summary>
 		/// <returns>"true" if game has been successfully started, otherwise "false"</returns>
 		virtual bool StartGame();
 
 		/// <summary>
-		/// Stops game
+		/// Finishes game
 		/// </summary>
 		/// <returns>"true" if game has been successfully stopped, otherwise "false"</returns>
-		virtual bool StopGame();
+		virtual bool FinishGame();
 
 		/// <summary>
 		/// Gets the player role
@@ -127,7 +133,7 @@ namespace WhackAStoodentServer
 		/// <summary>
 		/// Processes tick
 		/// </summary>
-		virtual void ProcessTick(double deltaTime);
+		virtual void ProcessTick();
 
 	private:
 
@@ -152,13 +158,28 @@ namespace WhackAStoodentServer
 		bool isGameRunning;
 
 		/// <summary>
+		/// Is game finished
+		/// </summary>
+		bool isGameFinished;
+
+		/// <summary>
 		/// Game started time point
 		/// </summary>
-		std::chrono::steady_clock::time_point gameStartedTimePoint;
+		std::chrono::high_resolution_clock::time_point gameStartedTimePoint;
 
 		/// <summary>
 		/// Looking hole index
 		/// </summary>
 		int lookingHoleIndex;
+
+		/// <summary>
+		/// Last hit time point
+		/// </summary>
+		std::chrono::high_resolution_clock::time_point lastHitTimePoint;
+
+		/// <summary>
+		/// Last looking tick time point
+		/// </summary>
+		std::chrono::high_resolution_clock::time_point lastLookingTickTimePoint;
 	};
 }
