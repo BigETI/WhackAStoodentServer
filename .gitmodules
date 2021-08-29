@@ -4,6 +4,3 @@
 [submodule ".\\dependencies\\stduuid"]
 	path = .\\dependencies\\stduuid
 	url = https://github.com/mariusbancila/stduuid
-[submodule "dependencies/enet"]
-	path = dependencies/enet
-	url = https://github.com/lsalzman/enet.git

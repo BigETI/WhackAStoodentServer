@@ -4,7 +4,7 @@
 #              #
 ################
 
-add_subdirectory(enet)
+#add_subdirectory(enet)
 
 include("cmake-conan/conan.cmake")
 
