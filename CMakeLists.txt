@@ -52,6 +52,7 @@ add_executable(${WHACK_A_STOODENT_SERVER_PROJECT} "")
 
 add_subdirectory("include")
 add_subdirectory("src")
+add_subdirectory("dependencies/enet")
 
 set_property(TARGET ${WHACK_A_STOODENT_SERVER_PROJECT} PROPERTY CXX_STANDARD 20)
 set_property(TARGET ${WHACK_A_STOODENT_SERVER_PROJECT} PROPERTY CXX_STANDARD_REQUIRED ON)
@@ -70,11 +71,10 @@ find_package(nlohmann_json 1.3.17 REQUIRED)
 # stduuid from conan.io is broken, because GSL has issues
 # find_package(stduuid 1.0 REQUIRED)
 target_include_directories(${WHACK_A_STOODENT_SERVER_PROJECT} PUBLIC "dependencies/stduuid/include")
-target_include_directories(${WHACK_A_STOODENT_SERVER_PROJECT} PUBLIC "dependencies/enet/include")
+target_include_directories(${WHACK_A_STOODENT_SERVER_PROJECT} PUBLIC "dependencies/enet")
 
 if (WIN32)
 	target_link_libraries(${WHACK_A_STOODENT_SERVER_PROJECT} PUBLIC
-		enet
 		winmm
 		ws2_32
 	)

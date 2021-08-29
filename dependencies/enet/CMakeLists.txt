@@ -1,0 +1,5 @@
+target_sources(${WHACK_A_STOODENT_SERVER_PROJECT} PRIVATE
+	# Root
+	"${CMAKE_CURRENT_SOURCE_DIR}/enet.c"
+	"${CMAKE_CURRENT_SOURCE_DIR}/enet.h"
+)

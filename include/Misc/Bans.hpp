@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 #include <string_view>
 #include <unordered_set>
 
@@ -30,25 +31,25 @@ namespace WhackAStoodentServer
 		Bans(Bans&&) = delete;
 
 		/// <summary>
-		/// Is IPv4 address banned
+		/// Is IP address banned
 		/// </summary>
-		/// <param name="ipv4Address">IPv4 address</param>
-		/// <returns>"true" if IPv4 address is banned, otherwise "false"</returns>
-		virtual bool IsIPAddressBanned(std::uint32_t ipv4Address) const;
+		/// <param name="ipAddress">IP address</param>
+		/// <returns>"true" if IP address is banned, otherwise "false"</returns>
+		virtual bool IsIPAddressBanned(std::string_view ipAddress) const;
 
 		/// <summary>
-		/// Bans the specified IPv4 address
+		/// Bans the specified IP address
 		/// </summary>
-		/// <param name="ipv4Address">IPv4 address</param>
-		/// <returns>"true" if IPv4 address has been successfully banned, otherwise "false"</returns>
-		virtual bool BanIPAddress(std::uint32_t ipv4Address);
+		/// <param name="ipAddress">IP address</param>
+		/// <returns>"true" if IP address has been successfully banned, otherwise "false"</returns>
+		virtual bool BanIPAddress(std::string_view ipAddress);
 
 		/// <summary>
 		/// Unbans the specififed IP address
 		/// </summary>
-		/// <param name="ipv4Address">IPv4 address</param>
-		/// <returns>"true" if IPv4 address has been successfully unbanned, otherwise "false"</returns>
-		virtual bool UnbanIPAddress(std::uint32_t ipv4Address);
+		/// <param name="ipAddress">IP address</param>
+		/// <returns>"true" if IP address has been successfully unbanned, otherwise "false"</returns>
+		virtual bool UnbanIPAddress(std::string_view ipAddress);
 
 		/// <summary>
 		/// Clears all bans
@@ -77,6 +78,6 @@ namespace WhackAStoodentServer
 		/// <summary>
 		/// Banned IPv4 addresses
 		/// </summary>
-		std::unordered_set<std::uint32_t> bannedIPv4Addresses;
+		std::unordered_set<std::string> bannedIPAddresses;
 	};
 }

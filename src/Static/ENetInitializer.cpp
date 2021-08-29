@@ -1,4 +1,4 @@
-#include <enet/enet.h>
+#include <enet.h>
 
 #include <Exceptions/ENetInitializationFailedException.hpp>
 #include <Static/ENetInitializer.hpp>

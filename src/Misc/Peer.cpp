@@ -14,7 +14,7 @@ WhackAStoodentServer::Peer::Peer(ENetPeer* peer) : peer(peer)
 	{
 		throw std::invalid_argument("Parameter \"peer\" is null.");
 	}
-	WhackAStoodentServer::IPUtilities::GetIPv4AddressString(peer->address.host, ipv4AddressString);
+	WhackAStoodentServer::IPUtilities::GetIPAddressString(peer->address, ipAddressString);
 }
 
 /// <summary>
@@ -44,21 +44,12 @@ std::uint16_t WhackAStoodentServer::Peer::GetOutgoingPeerID() const
 }
 
 /// <summary>
-/// Gets the IPv4 address
+/// Gets the IP address string
 /// </summary>
-/// <returns>IPv4 address</returns>
-std::uint32_t WhackAStoodentServer::Peer::GetIPv4Address() const
+/// <returns>IP address string</returns>
+std::string_view WhackAStoodentServer::Peer::GetIPAddressString() const
 {
-	return peer->address.host;
-}
-
-/// <summary>
-/// Gets the IPv4 address string
-/// </summary>
-/// <returns>IPv4 address string</returns>
-std::string_view WhackAStoodentServer::Peer::GetIPv4AddressString() const
-{
-	return ipv4AddressString;
+	return ipAddressString;
 }
 
 /// <summary>
@@ -81,7 +72,7 @@ void WhackAStoodentServer::Peer::SendPeerMessage(const std::vector<uint8_t>& dat
 /// <param name="reason">Disconnection reason</param>
 void WhackAStoodentServer::Peer::Disconnect(WhackAStoodentServer::EDisconnectionReason reason)
 {
-	enet_uint32 data(static_cast<enet_uint32>(reason));
+	std::uint32_t data(static_cast<std::uint32_t>(reason));
 	switch (reason)
 	{
 	case EDisconnectionReason::NoReason:

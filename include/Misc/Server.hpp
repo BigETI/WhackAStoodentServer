@@ -8,7 +8,7 @@
 #include <type_traits>
 #include <unordered_map>
 
-#include <enet/enet.h>
+#include <enet.h>
 #include <uuid.h>
 
 #include <Abstract/ASerializableMessage.hpp>

@@ -4,8 +4,6 @@
 #              #
 ################
 
-#add_subdirectory(enet)
-
 include("cmake-conan/conan.cmake")
 
 macro(conan_require_find_packages)

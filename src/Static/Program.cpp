@@ -1,3 +1,4 @@
+#include <chrono>
 #include <iostream>
 #include <map>
 #include <stdexcept>
@@ -29,14 +30,14 @@ void WhackAStoodentServer::Program::Main(const std::span<const std::string> argu
 
 		// TODO: Parse configuration
 
-		std::time_t tick_time(static_cast<double>(tick_count_per_second) * 0.000001);
+		std::chrono::microseconds tick_time(1000000U / tick_count_per_second);
 		WhackAStoodentServer::Server server(port, timeout_time);
 		std::cout << "Starting Whack-A-Stoodent server at port " << port << "..." << std::endl;
 		server.Start();
 		std::cout << "Whack-A-Stoodent server started!" << std::endl;
 		while (server.ProcessMessages())
 		{
-			std::this_thread::sleep_for(std::chrono::microseconds(tick_time));
+			std::this_thread::sleep_for(tick_time);
 		}
 		std::cout << "Stopping Whack-A-Stoodent server..." << std::endl;
 		server.Stop();

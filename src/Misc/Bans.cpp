@@ -22,36 +22,37 @@ WhackAStoodentServer::Bans::~Bans()
 /// <summary>
 /// Is IPv4 address banned
 /// </summary>
-/// <param name="ipv4Address">IPv4 address</param>
+/// <param name="ipAddress">IP address</param>
 /// <returns>"true" if IPv4 address is banned, otherwise "false"</returns>
-bool WhackAStoodentServer::Bans::IsIPAddressBanned(std::uint32_t ipv4Address) const
+bool WhackAStoodentServer::Bans::IsIPAddressBanned(std::string_view ipAddress) const
 {
-	return bannedIPv4Addresses.contains(ipv4Address);
+	return bannedIPAddresses.contains(std::string(ipAddress));
 }
 
 /// <summary>
-/// Bans the specified IPv4 address
+/// Bans the specified IP address
 /// </summary>
-/// <param name="ipv4Address">IPv4 address</param>
+/// <param name="ipAddress">IP address</param>
 /// <returns>"true" if IPv4 address has been successfully banned, otherwise "false"</returns>
-bool WhackAStoodentServer::Bans::BanIPAddress(std::uint32_t ipv4Address)
+bool WhackAStoodentServer::Bans::BanIPAddress(std::string_view ipAddress)
 {
-	bool ret((ipv4Address != static_cast<std::uint32_t>(0)) && !bannedIPv4Addresses.contains(ipv4Address));
+	std::string ip_address(ipAddress);
+	bool ret(WhackAStoodentServer::IPUtilities::IsIPAddressStringValid(ipAddress) && !bannedIPAddresses.contains(ip_address));
 	if (ret)
 	{
-		bannedIPv4Addresses.insert(ipv4Address);
+		bannedIPAddresses.insert(ip_address);
 	}
 	return ret;
 }
 
 /// <summary>
-/// Unbans the specififed IPv4 address
+/// Unbans the specififed IP address
 /// </summary>
-/// <param name="ipv4Address">IPv4 address</param>
+/// <param name="ipv4Address">IP address</param>
 /// <returns>"true" if IPv4 address has been successfully unbanned, otherwise "false"</returns>
-bool WhackAStoodentServer::Bans::UnbanIPAddress(std::uint32_t ipv4Address)
+bool WhackAStoodentServer::Bans::UnbanIPAddress(std::string_view ipAddress)
 {
-	return !!bannedIPv4Addresses.erase(ipv4Address);
+	return !!bannedIPAddresses.erase(std::string(ipAddress));
 }
 
 /// <summary>
@@ -59,7 +60,7 @@ bool WhackAStoodentServer::Bans::UnbanIPAddress(std::uint32_t ipv4Address)
 /// </summary>
 void WhackAStoodentServer::Bans::Clear()
 {
-	bannedIPv4Addresses.clear();
+	bannedIPAddresses.clear();
 }
 
 /// <summary>
@@ -73,9 +74,9 @@ std::size_t WhackAStoodentServer::Bans::LoadFromFile(std::string_view filePath)
 	std::ifstream input_file_stream(filePath.data());
 	if (input_file_stream.good())
 	{
-		for (std::string ipv4_address_string; std::getline(input_file_stream, ipv4_address_string);)
+		for (std::string ip_address_string; std::getline(input_file_stream, ip_address_string);)
 		{
-			if (BanIPAddress(WhackAStoodentServer::IPUtilities::ParseIPv4AddressString(ipv4_address_string)))
+			if (BanIPAddress(ip_address_string))
 			{
 				++ret;
 			}
@@ -95,10 +96,10 @@ bool WhackAStoodentServer::Bans::SaveToFile(std::string_view filePath)
 	std::ofstream output_file_stream(std::string(filePath).c_str());
 	if (output_file_stream.good())
 	{
-		std::string banned_ipv4_address_string;
-		for (const auto& banned_ipv4_address : bannedIPv4Addresses)
+		std::string banned_ip_address_string;
+		for (const std::string& banned_ip_address : bannedIPAddresses)
 		{
-			output_file_stream << WhackAStoodentServer::IPUtilities::GetIPv4AddressString(banned_ipv4_address, banned_ipv4_address_string) << std::endl;
+			output_file_stream << banned_ip_address << std::endl;
 		}
 	}
 	return ret;

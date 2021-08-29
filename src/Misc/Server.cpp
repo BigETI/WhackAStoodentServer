@@ -1,8 +1,6 @@
 #include <iostream>
 #include <span>
 
-#include <enet/enet.h>
-
 #include <Enumerators/EMessageType.hpp>
 #include <Enumerators/EPlayerRole.hpp>
 #include <Exceptions/ENetInitializationFailedException.hpp>
@@ -354,15 +352,16 @@ bool WhackAStoodentServer::Server::Start()
 	if (!enetHost)
 	{
 		ENetAddress enet_address;
-		enet_address_set_host(&enet_address, "localhost");
+		enet_address_set_hostname(&enet_address, "localhost");
 		enet_address.port = port;
 		enetHost = enet_host_create
 		(
 			&enet_address,
 			static_cast<std::size_t>(ENET_PROTOCOL_MAXIMUM_PEER_ID),
 			static_cast<std::size_t>(ENET_PROTOCOL_MAXIMUM_CHANNEL_COUNT),
-			static_cast<enet_uint32>(0),
-			static_cast<enet_uint32>(0)
+			static_cast<std::uint32_t>(0),
+			static_cast<std::uint32_t>(0),
+			ENET_HOST_BUFFER_SIZE_MAX
 		);
 		ret = !!enetHost;
 	}
@@ -412,6 +411,7 @@ bool WhackAStoodentServer::Server::ProcessMessages()
 			is_polling = (host_service_result > 0);
 			if (is_polling)
 			{
+				std::cout << "is_polling" << std::endl;
 				switch (enet_event.type)
 				{
 				case ENET_EVENT_TYPE_NONE:
@@ -423,18 +423,21 @@ bool WhackAStoodentServer::Server::ProcessMessages()
 						peers.insert_or_assign(enet_event.peer->incomingPeerID, peer);
 						peer->OnConnectionAttempted += [&, peer]()
 						{
+							std::cout << "Connection attempt from peer ID " << peer->GetIncomingPeerID() << " with IP " << peer->GetIPAddressString() << "." << std::endl;
 							OnPeerConnectionAttempted(peer);
 						};
 						peer->OnConnected += [&, peer]()
 						{
+							std::cout << "Peer ID " << peer->GetIncomingPeerID() << " with IP " << peer->GetIPAddressString() << "has connected." << std::endl;
 							OnPeerConnected(peer);
 						};
 						peer->OnDisconnected += [&, peer]()
 						{
+							std::cout << "Peer ID " << peer->GetIncomingPeerID() << " with IP " << peer->GetIPAddressString() << "has been disconnected." << std::endl;
 							OnPeerDisconnected(peer);
 						};
 						peer->OnConnectionAttempted();
-						if (bans.IsIPAddressBanned(peer->GetIPv4Address()))
+						if (bans.IsIPAddressBanned(peer->GetIPAddressString()))
 						{
 							peer->Disconnect(WhackAStoodentServer::EDisconnectionReason::Banned);
 						}

@@ -5,7 +5,7 @@
 #include <string_view>
 #include <vector>
 
-#include <enet/enet.h>
+#include <enet.h>
 
 #include <Enumerators/EDisconnectionReason.hpp>
 #include <Enumerators/EErrorType.hpp>
@@ -84,16 +84,10 @@ namespace WhackAStoodentServer
 		virtual std::uint16_t GetOutgoingPeerID() const;
 
 		/// <summary>
-		/// Gets the IPv4 address
+		/// Gets the IP address string
 		/// </summary>
-		/// <returns>IPv4 address</returns>
-		virtual std::uint32_t GetIPv4Address() const;
-
-		/// <summary>
-		/// Gets the IPv4 address string
-		/// </summary>
-		/// <returns>IPv4 address string</returns>
-		virtual std::string_view GetIPv4AddressString() const;
+		/// <returns>IP address string</returns>
+		virtual std::string_view GetIPAddressString() const;
 
 		/// <summary>
 		/// Sends message to peer
@@ -133,8 +127,8 @@ namespace WhackAStoodentServer
 		ENetPeer* peer;
 
 		/// <summary>
-		/// IPv4 address string
+		/// IP address string
 		/// </summary>
-		std::string ipv4AddressString;
+		std::string ipAddressString;
 	};
 }
