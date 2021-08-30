@@ -145,12 +145,12 @@ namespace WhackAStoodentServer
 		/// <summary>
 		/// Hitter user
 		/// </summary>
-		std::pair<std::shared_ptr<User>, bool> hitterUser;
+		std::shared_ptr<User> hitterUser;
 
 		/// <summary>
 		/// Mole user
 		/// </summary>
-		std::pair<std::shared_ptr<User>, bool> moleUser;
+		std::shared_ptr<User> moleUser;
 
 		/// <summary>
 		/// Is game running

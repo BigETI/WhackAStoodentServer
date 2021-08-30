@@ -26,8 +26,8 @@ const std::array<const WhackAStoodentServer::Hole, 4ULL> WhackAStoodentServer::G
 /// <param name="moleUser">User (mole)</param>
 WhackAStoodentServer::Game::Game(const uuids::uuid& gameID, std::shared_ptr<WhackAStoodentServer::User> hitterUser, std::shared_ptr<WhackAStoodentServer::User> moleUser) :
 	gameID(gameID),
-	hitterUser(std::make_pair(hitterUser, false)),
-	moleUser(std::make_pair(moleUser, false)),
+	hitterUser(hitterUser),
+	moleUser(moleUser),
 	isGameRunning(false),
 	gameStartedTimePoint(std::chrono::high_resolution_clock::now()),
 	lookingHoleIndex(-1)
@@ -74,7 +74,7 @@ const uuids::uuid& WhackAStoodentServer::Game::GetGameID() const
 /// <returns>"true" if game is loaded, otherwise "false"</returns>
 bool WhackAStoodentServer::Game::IsGameLoaded(WhackAStoodentServer::EPlayerRole role) const
 {
-	return (role == WhackAStoodentServer::EPlayerRole::Hitter) ? hitterUser.second : moleUser.second;
+	return (role == WhackAStoodentServer::EPlayerRole::Hitter) ? hitterUser->IsGameLoaded() : moleUser->IsGameLoaded();
 }
 
 /// <summary>
@@ -93,7 +93,7 @@ bool WhackAStoodentServer::Game::IsGameLoadedForUser(std::shared_ptr<WhackAStood
 /// <returns>"true" if games are loaded, otherwise "false"</returns>
 bool WhackAStoodentServer::Game::AreGamesLoaded() const
 {
-	return hitterUser.second && moleUser.second;
+	return hitterUser->IsGameLoaded() && moleUser->IsGameLoaded();
 }
 
 /// <summary>
@@ -125,10 +125,10 @@ bool WhackAStoodentServer::Game::StartGame()
 	{
 		gameStartedTimePoint = std::chrono::high_resolution_clock::now();
 		isGameRunning = true;
-		hitterUser.first->SetScore(0L);
-		moleUser.first->SetScore(0L);
-		hitterUser.first->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::LoadedGameMessage>();
-		moleUser.first->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::LoadedGameMessage>();
+		hitterUser->SetScore(0L);
+		moleUser->SetScore(0L);
+		hitterUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::LoadedGameMessage>();
+		moleUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::LoadedGameMessage>();
 		OnGameStarted();
 	}
 	return ret;
@@ -145,8 +145,8 @@ bool WhackAStoodentServer::Game::FinishGame()
 	{
 		isGameRunning = false;
 		isGameFinished = true;
-		hitterUser.first->SetGameLoadedState(false);
-		moleUser.first->SetGameLoadedState(false);
+		hitterUser->SetGameLoadedState(false);
+		moleUser->SetGameLoadedState(false);
 		OnGameFinished();
 	}
 	return ret;
@@ -163,11 +163,11 @@ WhackAStoodentServer::EPlayerRole WhackAStoodentServer::Game::GetPlayerRole(std:
 		throw std::invalid_argument("Parameter \"user\" is null.");
 	}
 	WhackAStoodentServer::EPlayerRole ret;
-	if (user == hitterUser.first)
+	if (user == hitterUser)
 	{
 		ret = WhackAStoodentServer::EPlayerRole::Hitter;
 	}
-	else if (user == moleUser.first)
+	else if (user == moleUser)
 	{
 		ret = WhackAStoodentServer::EPlayerRole::Mole;
 	}
@@ -188,16 +188,16 @@ bool WhackAStoodentServer::Game::Hit(const WhackAStoodentServer::Vector2D<float>
 	bool ret((lookingHoleIndex >= 0) && ((std::chrono::high_resolution_clock::now() - lastHitTimePoint) >= WhackAStoodentServer::Rules::HittingCooldownTime) && Holes[lookingHoleIndex].IsPositionInHole(position));
 	if (ret)
 	{
-		std::int64_t new_score(hitterUser.first->GetScore() + WhackAStoodentServer::Rules::HittingScore);
+		std::int64_t new_score(hitterUser->GetScore() + WhackAStoodentServer::Rules::HittingScore);
 		lookingHoleIndex = -1;
-		hitterUser.first->SetScore(new_score);
-		hitterUser.first->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HitSuccessMessage>(static_cast<std::size_t>(lookingHoleIndex), new_score, position);
-		moleUser.first->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HitSuccessMessage>(static_cast<std::size_t>(lookingHoleIndex), new_score, position);
+		hitterUser->SetScore(new_score);
+		hitterUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HitSuccessMessage>(static_cast<std::size_t>(lookingHoleIndex), new_score, position);
+		moleUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HitSuccessMessage>(static_cast<std::size_t>(lookingHoleIndex), new_score, position);
 	}
 	else
 	{
-		hitterUser.first->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HitFailMessage>(position);
-		moleUser.first->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HitFailMessage>(position);
+		hitterUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HitFailMessage>(position);
+		moleUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HitFailMessage>(position);
 	}
 	return ret;
 }
@@ -218,8 +218,8 @@ bool WhackAStoodentServer::Game::Look(std::size_t holeIndex)
 	{
 		lookingHoleIndex = static_cast<int>(holeIndex);
 		lastLookingTickTimePoint = std::chrono::high_resolution_clock::now();
-		hitterUser.first->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::LookMessage>(holeIndex);
-		moleUser.first->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::LookMessage>(holeIndex);
+		hitterUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::LookMessage>(holeIndex);
+		moleUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::LookMessage>(holeIndex);
 	}
 	return ret;
 }
@@ -234,8 +234,8 @@ bool WhackAStoodentServer::Game::Hide()
 	if (ret)
 	{
 		lookingHoleIndex = -1;
-		hitterUser.first->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HideMessage>();
-		moleUser.first->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HideMessage>();
+		hitterUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HideMessage>();
+		moleUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HideMessage>();
 	}
 	return ret;
 }
@@ -256,12 +256,12 @@ void WhackAStoodentServer::Game::ProcessTick()
 				while (elapsed_look_tick_time >= WhackAStoodentServer::Rules::LookingTickTime)
 				{
 					elapsed_look_tick_time -= WhackAStoodentServer::Rules::LookingTickTime;
-					moleUser.first->SetScore(moleUser.first->GetScore() + WhackAStoodentServer::Rules::LookingScorePerLookingTick);
+					moleUser->SetScore(moleUser->GetScore() + WhackAStoodentServer::Rules::LookingScorePerLookingTick);
 					is_sending_mole_scored_message = true;
 				}
 				if (is_sending_mole_scored_message)
 				{
-					hitterUser.first->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::ScoreMoleMessage>(moleUser.first->GetScore());
+					hitterUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::ScoreMoleMessage>(moleUser->GetScore());
 				}
 			}
 		}
