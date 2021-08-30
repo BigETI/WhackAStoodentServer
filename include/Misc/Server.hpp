@@ -5,6 +5,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <thread>
 #include <type_traits>
 #include <unordered_map>
 
@@ -13,6 +14,7 @@
 
 #include <Abstract/ASerializableMessage.hpp>
 #include <Misc/Bans.hpp>
+#include <Misc/ConcurrentQueue.hpp>
 #include <Misc/Event.hpp>
 #include <Misc/Game.hpp>
 #include <Misc/Lobby.hpp>
@@ -141,6 +143,31 @@ namespace WhackAStoodentServer
 		ENetHost* enetHost;
 
 		/// <summary>
+		/// Networking thread
+		/// </summary>
+		std::thread* networkingThread;
+
+		/// <summary>
+		/// Is networking thread running
+		/// </summary>
+		volatile bool isNetworkingThreadRunning;
+
+		/// <summary>
+		/// Connected peer queue
+		/// </summary>
+		ConcurrentQueue<ENetPeer*> connectedPeerQueue;
+
+		/// <summary>
+		/// Disconnected peer queue
+		/// </summary>
+		ConcurrentQueue<std::uint16_t> disconnectedPeerQueue;
+
+		/// <summary>
+		/// Received message queue
+		/// </summary>
+		ConcurrentQueue<std::pair<std::uint16_t, std::shared_ptr<Message>>> receivedMessageQueue;
+
+		/// <summary>
 		/// Bans
 		/// </summary>
 		Bans bans;
@@ -159,6 +186,12 @@ namespace WhackAStoodentServer
 		/// Message parser lists
 		/// </summary>
 		std::unordered_map<EMessageType, std::forward_list<std::shared_ptr<IMessageParser>>> messageParserLists;
+
+		/// <summary>
+		/// Networking thread
+		/// </summary>
+		/// <param name="server">Server</param>
+		static void NetworkingThread(Server* server);
 
 		/// <summary>
 		/// Handles message parse failed event

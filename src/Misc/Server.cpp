@@ -35,7 +35,12 @@
 /// </summary>
 /// <param name="port">Network port</param>
 /// <param name="timeoutTime">Timeout time</param>
-WhackAStoodentServer::Server::Server(std::uint16_t port, std::uint32_t timeoutTime) : port(port), timeoutTime(timeoutTime), enetHost(nullptr)
+WhackAStoodentServer::Server::Server(std::uint16_t port, std::uint32_t timeoutTime) :
+	port(port),
+	timeoutTime(timeoutTime),
+	enetHost(nullptr),
+	networkingThread(nullptr),
+	isNetworkingThreadRunning(false)
 {
 	if (!port)
 	{
@@ -334,6 +339,7 @@ WhackAStoodentServer::Server::Server(std::uint16_t port, std::uint32_t timeoutTi
 /// </summary>
 WhackAStoodentServer::Server::~Server()
 {
+	Stop();
 	WhackAStoodentServer::ENetInitializer::Deinitialize();
 }
 
@@ -343,27 +349,16 @@ WhackAStoodentServer::Server::~Server()
 /// <returns>"true" if starting server was successful, otherwise "false"</returns>
 bool WhackAStoodentServer::Server::Start()
 {
-	bool ret(false);
-	std::size_t ban_count(bans.LoadFromFile(WhackAStoodentServer::Defaults::BansFilePath));
-	if (ban_count)
+	bool ret(!networkingThread);
+	if (ret)
 	{
-		std::cout << "Successfully loaded " << ban_count << " " << ((ban_count == static_cast<std::size_t>(1)) ? "ban" : "bans") << " from \"" << WhackAStoodentServer::Defaults::BansFilePath << "\"." << std::endl;
-	}
-	if (!enetHost)
-	{
-		ENetAddress enet_address;
-		enet_address_set_hostname(&enet_address, "localhost");
-		enet_address.port = port;
-		enetHost = enet_host_create
-		(
-			&enet_address,
-			static_cast<std::size_t>(ENET_PROTOCOL_MAXIMUM_PEER_ID),
-			static_cast<std::size_t>(ENET_PROTOCOL_MAXIMUM_CHANNEL_COUNT),
-			static_cast<std::uint32_t>(0),
-			static_cast<std::uint32_t>(0),
-			ENET_HOST_BUFFER_SIZE_MAX
-		);
-		ret = !!enetHost;
+		std::size_t ban_count(bans.LoadFromFile(WhackAStoodentServer::Defaults::BansFilePath));
+		if (ban_count)
+		{
+			std::cout << "Successfully loaded " << ban_count << " " << ((ban_count == static_cast<std::size_t>(1)) ? "ban" : "bans") << " from \"" << WhackAStoodentServer::Defaults::BansFilePath << "\"." << std::endl;
+		}
+		isNetworkingThreadRunning = true;
+		networkingThread = new std::thread(NetworkingThread, this);
 	}
 	return ret;
 }
@@ -373,15 +368,16 @@ bool WhackAStoodentServer::Server::Start()
 /// </summary>
 void WhackAStoodentServer::Server::Stop()
 {
-	if (enetHost)
+	if (networkingThread)
 	{
 		bans.SaveToFile(WhackAStoodentServer::Defaults::BansFilePath);
 		for (auto& peer : peers)
 		{
 			peer.second->Disconnect(WhackAStoodentServer::EDisconnectionReason::Stopped);
 		}
-		enet_host_destroy(enetHost);
-		enetHost = nullptr;
+		isNetworkingThreadRunning = false;
+		networkingThread->join();
+		networkingThread = nullptr;
 	}
 }
 
@@ -400,115 +396,91 @@ bool WhackAStoodentServer::Server::IsRunning() const
 /// <returns>"true" if server is still running, otherwise "false"</returns>
 bool WhackAStoodentServer::Server::ProcessMessages()
 {
-	bool ret(false);
-	if (enetHost)
+	bool ret(networkingThread);
+	if (ret)
 	{
-		bool is_polling(true);
-		ENetEvent enet_event;
-		while (is_polling)
 		{
-			int host_service_result(enet_host_service(enetHost, &enet_event, timeoutTime));
-			is_polling = (host_service_result > 0);
-			if (is_polling)
+			ENetPeer* enet_peer;
+			while (connectedPeerQueue.TryDequeue(enet_peer))
 			{
-				std::cout << "is_polling" << std::endl;
-				switch (enet_event.type)
+				std::shared_ptr<WhackAStoodentServer::Peer> peer(std::make_shared<WhackAStoodentServer::Peer>(enet_peer));
+				peers.insert_or_assign(enet_peer->incomingPeerID, peer);
+				peer->OnConnectionAttempted += [&, peer]()
 				{
-				case ENET_EVENT_TYPE_NONE:
-					// ...
-					break;
-				case ENET_EVENT_TYPE_CONNECT:
+					std::cout << "Connection attempt from peer ID " << peer->GetIncomingPeerID() << " with IP " << peer->GetIPAddressString() << "." << std::endl;
+					OnPeerConnectionAttempted(peer);
+				};
+				peer->OnConnected += [&, peer]()
+				{
+					std::cout << "Peer ID " << peer->GetIncomingPeerID() << " with IP " << peer->GetIPAddressString() << " has connected." << std::endl;
+					OnPeerConnected(peer);
+				};
+				peer->OnDisconnected += [&, peer]()
+				{
+					std::cout << "Peer ID " << peer->GetIncomingPeerID() << " with IP " << peer->GetIPAddressString() << " has been disconnected." << std::endl;
+					OnPeerDisconnected(peer);
+				};
+				peer->OnConnectionAttempted();
+				if (bans.IsIPAddressBanned(peer->GetIPAddressString()))
+				{
+					peer->Disconnect(WhackAStoodentServer::EDisconnectionReason::Banned);
+				}
+				else
+				{
+					peer->OnConnected();
+				}
+			}
+		}
+		{
+			std::uint16_t incoming_peer_id;
+			while (disconnectedPeerQueue.TryDequeue(incoming_peer_id))
+			{
+				auto peers_iterator(peers.find(incoming_peer_id));
+				if (peers_iterator != peers.end())
+				{
+					std::shared_ptr<WhackAStoodentServer::User> user;
+					if (lobby.TryGetUserFromPeer(peers_iterator->second, user))
 					{
-						std::shared_ptr<WhackAStoodentServer::Peer> peer(std::make_shared<WhackAStoodentServer::Peer>(enet_event.peer));
-						peers.insert_or_assign(enet_event.peer->incomingPeerID, peer);
-						peer->OnConnectionAttempted += [&, peer]()
+						lobby.RemoveUser(user);
+					}
+					peers_iterator->second->OnDisconnected();
+					peers.erase(peers_iterator);
+				}
+			}
+		}
+		{
+			std::pair<std::uint16_t, std::shared_ptr<WhackAStoodentServer::Message>> received_messsage;
+			while (receivedMessageQueue.TryDequeue(received_messsage))
+			{
+				auto peers_iterator(peers.find(received_messsage.first));
+				if (peers_iterator != peers.end())
+				{
+					try
+					{
+						std::shared_ptr<WhackAStoodentServer::Peer> peer(peers_iterator->second);
+						WhackAStoodentServer::EMessageType message_type(received_messsage.second->GetMessageType());
+						auto message_parser_list_iterator(messageParserLists.find(message_type));
+						if (message_parser_list_iterator == messageParserLists.end())
 						{
-							std::cout << "Connection attempt from peer ID " << peer->GetIncomingPeerID() << " with IP " << peer->GetIPAddressString() << "." << std::endl;
-							OnPeerConnectionAttempted(peer);
-						};
-						peer->OnConnected += [&, peer]()
-						{
-							std::cout << "Peer ID " << peer->GetIncomingPeerID() << " with IP " << peer->GetIPAddressString() << "has connected." << std::endl;
-							OnPeerConnected(peer);
-						};
-						peer->OnDisconnected += [&, peer]()
-						{
-							std::cout << "Peer ID " << peer->GetIncomingPeerID() << " with IP " << peer->GetIPAddressString() << "has been disconnected." << std::endl;
-							OnPeerDisconnected(peer);
-						};
-						peer->OnConnectionAttempted();
-						if (bans.IsIPAddressBanned(peer->GetIPAddressString()))
-						{
-							peer->Disconnect(WhackAStoodentServer::EDisconnectionReason::Banned);
+							peer->OnUnsupportedMessageTypeReceived(message_type);
+							peer->SendPeerMessage<Messages::ErrorMessage>(EErrorType::UnsupportedMessageType, L"Unsupported message type \"" + std::to_wstring(static_cast<int>(message_type)) + L"\" has been received.");
 						}
 						else
 						{
-							peer->OnConnected();
+							peer->OnMessageReceived(received_messsage.second);
+							for (const auto& message_parser : message_parser_list_iterator->second)
+							{
+								message_parser->ParsePeerMessage(peer, received_messsage.second);
+							}
 						}
 					}
-					break;
-				case ENET_EVENT_TYPE_DISCONNECT:
+					catch (const std::exception& e)
 					{
-						auto peers_iterator = peers.find(enet_event.peer->incomingPeerID);
-						if (peers_iterator != peers.end())
-						{
-							std::shared_ptr<WhackAStoodentServer::User> user;
-							if (lobby.TryGetUserFromPeer(peers_iterator->second, user))
-							{
-								lobby.RemoveUser(user);
-							}
-							peers_iterator->second->OnDisconnected();
-							peers.erase(peers_iterator);
-						}
+						std::cerr << e.what() << std::endl;
 					}
-					break;
-				case ENET_EVENT_TYPE_RECEIVE:
-					{
-						auto peers_iterator(peers.find(enet_event.peer->incomingPeerID));
-						if (peers_iterator != peers.end())
-						{
-							try
-							{
-								std::shared_ptr<WhackAStoodentServer::Peer> peer(peers_iterator->second);
-								std::shared_ptr<WhackAStoodentServer::Message> message(std::make_shared<WhackAStoodentServer::Message>(std::span<const std::uint8_t>(enet_event.packet->data, enet_event.packet->dataLength)));
-								WhackAStoodentServer::EMessageType message_type(message->GetMessageType());
-								auto message_parser_list_iterator(messageParserLists.find(message_type));
-								if (message_parser_list_iterator == messageParserLists.end())
-								{
-									peer->OnUnsupportedMessageTypeReceived(message_type);
-									peer->SendPeerMessage<Messages::ErrorMessage>(EErrorType::UnsupportedMessageType, L"Unsupported message type \"" + std::to_wstring(static_cast<int>(message_type)) + L"\" has been received.");
-								}
-								else
-								{
-									peer->OnMessageReceived(message);
-									for (const auto& message_parser : message_parser_list_iterator->second)
-									{
-										message_parser->ParsePeerMessage(peer, message);
-									}
-								}
-							}
-							catch (const std::exception& e)
-							{
-								std::cerr << e.what() << std::endl;
-							}
-						}
-						enet_packet_destroy(enet_event.packet);
-					}
-					break;
-				default:
-					std::cerr << "Invalid ENet event type \"" << enet_event.type << "\"" << std::endl;
-					break;
 				}
 			}
-			else if (host_service_result < 0)
-			{
-				std::cerr << "Failed to poll events from ENet." << std::endl;
-			}
-			ret = (host_service_result >= 0);
 		}
-	}
-	if (ret)
-	{
 		lobby.ProcessTick();
 	}
 	return ret;
@@ -530,6 +502,70 @@ WhackAStoodentServer::Bans& WhackAStoodentServer::Server::GetBans()
 const WhackAStoodentServer::Bans& WhackAStoodentServer::Server::GetBans() const
 {
 	return bans;
+}
+
+/// <summary>
+/// Networking thread
+/// </summary>
+/// <param name="server">Server</param>
+void WhackAStoodentServer::Server::NetworkingThread(Server* server)
+{
+	ENetAddress enet_address;
+	enet_address_set_hostname(&enet_address, "localhost");
+	enet_address.port = server->port;
+	server->enetHost = enet_host_create
+	(
+		&enet_address,
+		static_cast<std::size_t>(ENET_PROTOCOL_MAXIMUM_PEER_ID),
+		static_cast<std::size_t>(ENET_PROTOCOL_MAXIMUM_CHANNEL_COUNT),
+		static_cast<std::uint32_t>(0),
+		static_cast<std::uint32_t>(0),
+		ENET_HOST_BUFFER_SIZE_MAX
+	);
+	if (server->enetHost)
+	{
+		ENetEvent enet_event;
+		bool is_polling;
+		while (server->isNetworkingThreadRunning)
+		{
+			is_polling = true;
+			while (is_polling)
+			{
+				int host_service_result(enet_host_service(server->enetHost, &enet_event, server->timeoutTime));
+				is_polling = (host_service_result > 0);
+				if (is_polling)
+				{
+					switch (enet_event.type)
+					{
+					case ENET_EVENT_TYPE_NONE:
+						// ...
+						break;
+					case ENET_EVENT_TYPE_CONNECT:
+						server->connectedPeerQueue.Enqueue(enet_event.peer);
+						break;
+					case ENET_EVENT_TYPE_DISCONNECT:
+						server->disconnectedPeerQueue.Enqueue(enet_event.peer->incomingPeerID);
+						break;
+					case ENET_EVENT_TYPE_RECEIVE:
+						server->receivedMessageQueue.Enqueue(std::make_pair(enet_event.peer->incomingPeerID, std::make_shared<WhackAStoodentServer::Message>(std::span<const std::uint8_t>(enet_event.packet->data, enet_event.packet->dataLength))));
+						enet_packet_destroy(enet_event.packet);
+						break;
+					default:
+						std::cerr << "Invalid ENet event type \"" << enet_event.type << "\"" << std::endl;
+						break;
+					}
+				}
+				else if (host_service_result < 0)
+				{
+					server->isNetworkingThreadRunning = false;
+					std::cerr << "Failed to poll events from ENet." << std::endl;
+				}
+			}
+		}
+		enet_host_destroy(server->enetHost);
+		server->enetHost = nullptr;
+	}
+	server->isNetworkingThreadRunning = false;
 }
 
 /// <summary>

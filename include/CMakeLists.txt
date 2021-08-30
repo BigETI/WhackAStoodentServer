@@ -54,6 +54,7 @@ target_sources(${WHACK_A_STOODENT_SERVER_PROJECT} PRIVATE
 	
 	# Misc
 	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Bans.hpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/ConcurrentQueue.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Event.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Game.hpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Misc/Hole.hpp"
