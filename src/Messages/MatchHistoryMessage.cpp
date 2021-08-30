@@ -46,7 +46,7 @@ WhackAStoodentServer::Messages::MatchHistoryMessage::~MatchHistoryMessage()
 /// Gets match history
 /// </summary>
 /// <returns>Match history</returns>
-const std::span<const WhackAStoodentServer::MatchHistoryEntry> WhackAStoodentServer::Messages::MatchHistoryMessage::GetMatchHistory() const
+std::span<const WhackAStoodentServer::MatchHistoryEntry> WhackAStoodentServer::Messages::MatchHistoryMessage::GetMatchHistory() const
 {
 	return matchHistory;
 }
@@ -67,7 +67,7 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::MatchHistoryMessage::
 /// </summary>
 /// <param name="data">Data to deserialize</param>
 /// <returns>Remaining data to deserialize</returns>
-std::span<std::uint8_t const> WhackAStoodentServer::Messages::MatchHistoryMessage::Deserialize(const std::span<std::uint8_t const>& data)
+std::span<const std::uint8_t> WhackAStoodentServer::Messages::MatchHistoryMessage::Deserialize(std::span<const std::uint8_t> data)
 {
 	std::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::MatchHistory>::Deserialize(data));
 	return WhackAStoodentServer::CollectionSerializer::DeserializeIntegerSizedCollection<WhackAStoodentServer::MatchHistoryEntry>(next_bytes, matchHistory);

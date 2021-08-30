@@ -30,7 +30,7 @@ namespace WhackAStoodentServer
 		/// Constructs a message
 		/// </summary>
 		/// <param name="data">Message data</param>
-		Message(const std::span<const std::uint8_t> data);
+		Message(std::span<const std::uint8_t> data);
 
 		/// <summary>
 		/// Gets the message type
@@ -42,7 +42,7 @@ namespace WhackAStoodentServer
 		/// Gets message data
 		/// </summary>
 		/// <returns>Message data</returns>
-		const std::span<std::uint8_t const> GetData() const;
+		std::span<const std::uint8_t> GetData() const;
 
 		/// <summary>
 		/// Tries to get data

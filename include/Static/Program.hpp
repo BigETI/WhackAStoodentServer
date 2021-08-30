@@ -24,7 +24,7 @@ namespace WhackAStoodentServer
 		/// Main entry point
 		/// </summary>
 		/// <param name="arguments">Arguments</param>
-		static void Main(const std::span<const std::string> arguments);
+		static void Main(std::span<const std::string> arguments);
 
 		/// <summary>
 		/// Gets the current exit code

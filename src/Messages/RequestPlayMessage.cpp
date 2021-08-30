@@ -74,9 +74,9 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::RequestPlayMessage::S
 /// </summary>
 /// <param name="data">Data to deserialize</param>
 /// <returns>Remaining data to deserialize</returns>
-std::span<std::uint8_t const> WhackAStoodentServer::Messages::RequestPlayMessage::Deserialize(const std::span<std::uint8_t const>& data)
+std::span<const std::uint8_t> WhackAStoodentServer::Messages::RequestPlayMessage::Deserialize(std::span<const std::uint8_t> data)
 {
-	std::span<std::uint8_t const> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::RequestPlay>::Deserialize(data));
+	std::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::RequestPlay>::Deserialize(data));
 	next_bytes = WhackAStoodentServer::SessionCodes::Deserialize(next_bytes, opponentSessionCode);
 	return WhackAStoodentServer::StringSerializer::DeserializeByteSizedString(next_bytes, opponentName);
 }

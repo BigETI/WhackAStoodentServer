@@ -19,7 +19,7 @@ int WhackAStoodentServer::Program::exitCode(-1);
 /// Main entry point
 /// </summary>
 /// <param name="arguments">Arguments</param>
-void WhackAStoodentServer::Program::Main(const std::span<const std::string> arguments)
+void WhackAStoodentServer::Program::Main(std::span<const std::string> arguments)
 {
 	try
 	{

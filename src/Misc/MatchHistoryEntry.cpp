@@ -133,12 +133,12 @@ std::wstring_view WhackAStoodentServer::MatchHistoryEntry::GetOpponentName() con
 /// <returns>Serialized contents</returns>
 std::vector<std::uint8_t>& WhackAStoodentServer::MatchHistoryEntry::Serialize(std::vector<std::uint8_t>& result) const
 {
-	NumericSerializer::SerializeLong(yourScore, result);
-	NumericSerializer::SerializeByte(static_cast<std::uint8_t>(yourRole), result);
-	StringSerializer::SerializeByteSizedString(yourName, result);
-	NumericSerializer::SerializeLong(opponentScore, result);
-	NumericSerializer::SerializeByte(static_cast<std::uint8_t>(opponentRole), result);
-	return StringSerializer::SerializeByteSizedString(opponentName, result);
+	WhackAStoodentServer::NumericSerializer::SerializeLong(yourScore, result);
+	WhackAStoodentServer::NumericSerializer::SerializeByte(static_cast<std::uint8_t>(yourRole), result);
+	WhackAStoodentServer::StringSerializer::SerializeByteSizedString(yourName, result);
+	WhackAStoodentServer::NumericSerializer::SerializeLong(opponentScore, result);
+	WhackAStoodentServer::NumericSerializer::SerializeByte(static_cast<std::uint8_t>(opponentRole), result);
+	return WhackAStoodentServer::StringSerializer::SerializeByteSizedString(opponentName, result);
 }
 
 /// <summary>
@@ -146,17 +146,17 @@ std::vector<std::uint8_t>& WhackAStoodentServer::MatchHistoryEntry::Serialize(st
 /// </summary>
 /// <param name="data">Data to deserialize</param>
 /// <returns>Remaining data to deserialize</returns>
-std::span<std::uint8_t const> WhackAStoodentServer::MatchHistoryEntry::Deserialize(const std::span<std::uint8_t const>& data)
+std::span<const std::uint8_t> WhackAStoodentServer::MatchHistoryEntry::Deserialize(std::span<const std::uint8_t> data)
 {
 	std::uint8_t role;
-	std::span<std::uint8_t const> next_bytes(NumericSerializer::DeserializeLong(data, yourScore));
-	next_bytes = NumericSerializer::DeserializeByte(next_bytes, role);
+	std::span<const std::uint8_t> next_bytes(WhackAStoodentServer::NumericSerializer::DeserializeLong(data, yourScore));
+	next_bytes = WhackAStoodentServer::NumericSerializer::DeserializeByte(next_bytes, role);
 	yourRole = static_cast<WhackAStoodentServer::EPlayerRole>(role);
-	next_bytes = StringSerializer::DeserializeByteSizedString(next_bytes, yourName);
-	next_bytes = NumericSerializer::DeserializeLong(next_bytes, opponentScore);
-	next_bytes = NumericSerializer::DeserializeByte(next_bytes, role);
+	next_bytes = WhackAStoodentServer::StringSerializer::DeserializeByteSizedString(next_bytes, yourName);
+	next_bytes = WhackAStoodentServer::NumericSerializer::DeserializeLong(next_bytes, opponentScore);
+	next_bytes = WhackAStoodentServer::NumericSerializer::DeserializeByte(next_bytes, role);
 	opponentRole = static_cast<WhackAStoodentServer::EPlayerRole>(role);
-	return StringSerializer::DeserializeByteSizedString(next_bytes, opponentName);
+	return WhackAStoodentServer::StringSerializer::DeserializeByteSizedString(next_bytes, opponentName);
 }
 
 /// <summary>

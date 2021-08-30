@@ -67,7 +67,7 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::EndGameMessage::Seria
 /// </summary>
 /// <param name="data">Data to deserialize</param>
 /// <returns>Remaining data to deserialize</returns>
-std::span<const std::uint8_t> WhackAStoodentServer::Messages::EndGameMessage::Deserialize(const std::span<const std::uint8_t>& data)
+std::span<const std::uint8_t> WhackAStoodentServer::Messages::EndGameMessage::Deserialize(std::span<const std::uint8_t> data)
 {
 	std::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::EndGame>::Deserialize(data));
 	return WhackAStoodentServer::CollectionSerializer::DeserializeIntegerSizedCollection<WhackAStoodentServer::MatchHistoryEntry>(next_bytes, matchHistory);

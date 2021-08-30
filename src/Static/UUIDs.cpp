@@ -39,7 +39,7 @@ std::vector<std::uint8_t>& WhackAStoodentServer::UUIDs::SerializeUUID(const uuid
 /// <param name="bytes">Data</param>
 /// <param name="result">Result</param>
 /// <returns>Remaining data to be deserialized</returns>
-std::span<std::uint8_t const> WhackAStoodentServer::UUIDs::DeserializeUUID(const std::span<std::uint8_t const>& bytes, uuids::uuid& result)
+std::span<const std::uint8_t> WhackAStoodentServer::UUIDs::DeserializeUUID(std::span<const std::uint8_t> bytes, uuids::uuid& result)
 {
 	if (bytes.size() < DataSize)
 	{

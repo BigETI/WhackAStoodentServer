@@ -53,7 +53,7 @@ namespace WhackAStoodentServer
 		/// <param name="bytes">Data</param>
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
-		static std::span<const std::uint8_t> Deserialize(const std::span<const std::uint8_t> bytes, std::string& result);
+		static std::span<const std::uint8_t> Deserialize(std::span<const std::uint8_t> bytes, std::string& result);
 
 		SessionCodes& operator=(const SessionCodes&) = delete;
 		SessionCodes& operator=(SessionCodes&&) = delete;

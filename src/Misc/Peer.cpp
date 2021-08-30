@@ -56,7 +56,7 @@ std::string_view WhackAStoodentServer::Peer::GetIPAddressString() const
 /// Sends a peer message
 /// </summary>
 /// <param name="data">Data</param>
-void WhackAStoodentServer::Peer::SendPeerMessage(const std::vector<uint8_t>& data)
+void WhackAStoodentServer::Peer::SendPeerMessage(std::span<const std::uint8_t> data)
 {
 	ENetPacket* packet(enet_packet_create(data.data(), data.size(), ENET_PACKET_FLAG_RELIABLE));
 	int error_code(enet_peer_send(peer, 0, packet));

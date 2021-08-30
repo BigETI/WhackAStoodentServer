@@ -55,9 +55,9 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::DenyPlayRequestMessag
 /// </summary>
 /// <param name="data">Data to deserialize</param>
 /// <returns>Remaining data to deserialize</returns>
-std::span<std::uint8_t const> WhackAStoodentServer::Messages::DenyPlayRequestMessage::Deserialize(const std::span<std::uint8_t const>& data)
+std::span<const std::uint8_t> WhackAStoodentServer::Messages::DenyPlayRequestMessage::Deserialize(std::span<const std::uint8_t> data)
 {
-	std::span<std::uint8_t const> ret(WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::DenyPlayRequest>::Deserialize(data));
+	std::span<const std::uint8_t> ret(WhackAStoodentServer::Messages::ASerializableMessage<EMessageType::DenyPlayRequest>::Deserialize(data));
 	std::uint8_t reason_id;
 	ret = WhackAStoodentServer::NumericSerializer::DeserializeByte(ret, reason_id);
 	reason = static_cast<WhackAStoodentServer::EDenyPlayRequestReason>(reason_id);

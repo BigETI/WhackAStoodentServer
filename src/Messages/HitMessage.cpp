@@ -53,8 +53,8 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::HitMessage::Serialize
 /// </summary>
 /// <param name="data">Data to deserialize</param>
 /// <returns>Remaining data to deserialize</returns>
-std::span<std::uint8_t const> WhackAStoodentServer::Messages::HitMessage::Deserialize(const std::span<std::uint8_t const>& data)
+std::span<const std::uint8_t> WhackAStoodentServer::Messages::HitMessage::Deserialize(std::span<const std::uint8_t> data)
 {
-	std::span<std::uint8_t const> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Hit>::Deserialize(data));
+	std::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Hit>::Deserialize(data));
 	return position.Deserialize(next_bytes);
 }

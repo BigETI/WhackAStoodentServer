@@ -65,7 +65,7 @@ std::vector<std::uint8_t>& WhackAStoodentServer::SessionCodes::Serialize(std::st
 /// <param name="bytes">Data</param>
 /// <param name="result">Result</param>
 /// <returns>Remaining data to be deserialized</returns>
-std::span<const std::uint8_t> WhackAStoodentServer::SessionCodes::Deserialize(const std::span<const std::uint8_t> bytes, std::string& result)
+std::span<const std::uint8_t> WhackAStoodentServer::SessionCodes::Deserialize(std::span<const std::uint8_t> bytes, std::string& result)
 {
 	if (bytes.size() < WhackAStoodentServer::Rules::SessionCodeCharacterCount)
 	{

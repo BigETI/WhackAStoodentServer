@@ -61,7 +61,7 @@ namespace WhackAStoodentServer
 		}
 
 		template <typename TLength>
-		static std::span<const std::uint8_t> Deserialize(const std::span<const std::uint8_t>& bytes, std::wstring& result)
+		static std::span<const std::uint8_t> Deserialize(std::span<const std::uint8_t> bytes, std::wstring& result)
 		{
 			static_assert
 			(
@@ -71,7 +71,7 @@ namespace WhackAStoodentServer
 				std::is_same<std::uint64_t, TLength>::value
 			);
 			TLength string_length;
-			std::span<std::uint8_t const> next_bytes(NumericSerializer::Deserialize<TLength>(bytes, string_length));
+			std::span<const std::uint8_t> next_bytes(NumericSerializer::Deserialize<TLength>(bytes, string_length));
 			std::size_t length(static_cast<std::size_t>(string_length));
 			std::size_t size(length * sizeof(std::wstring::value_type));
 			if (next_bytes.size() < size)
@@ -83,22 +83,22 @@ namespace WhackAStoodentServer
 			return next_bytes.subspan(size, next_bytes.size() - size);
 		}
 
-		static inline std::span<const std::uint8_t> DeserializeByteSizedString(const std::span<std::uint8_t const>& bytes, std::wstring& result)
+		static inline std::span<const std::uint8_t> DeserializeByteSizedString(std::span<const std::uint8_t> bytes, std::wstring& result)
 		{
 			return Deserialize<std::uint8_t>(bytes, result);
 		}
 
-		static inline std::span<const std::uint8_t> DeserializeShortSizedString(const std::span<std::uint8_t const>& bytes, std::wstring& result)
+		static inline std::span<const std::uint8_t> DeserializeShortSizedString(std::span<const std::uint8_t> bytes, std::wstring& result)
 		{
 			return Deserialize<std::uint16_t>(bytes, result);
 		}
 
-		static inline std::span<const std::uint8_t> DeserializeIntegerSizedString(const std::span<std::uint8_t const>& bytes, std::wstring& result)
+		static inline std::span<const std::uint8_t> DeserializeIntegerSizedString(std::span<const std::uint8_t> bytes, std::wstring& result)
 		{
 			return Deserialize<std::uint32_t>(bytes, result);
 		}
 
-		static inline std::span<const std::uint8_t> DeserializeLongSizedString(const std::span<std::uint8_t const>& bytes, std::wstring& result)
+		static inline std::span<const std::uint8_t> DeserializeLongSizedString(std::span<const std::uint8_t> bytes, std::wstring& result)
 		{
 			return Deserialize<std::uint64_t>(bytes, result);
 		}

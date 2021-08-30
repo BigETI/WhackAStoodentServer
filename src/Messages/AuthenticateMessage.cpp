@@ -67,9 +67,9 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::AuthenticateMessage::
 /// </summary>
 /// <param name="data">Data to deserialize</param>
 /// <returns>Remaining data to deserialize</returns>
-std::span<const std::uint8_t> WhackAStoodentServer::Messages::AuthenticateMessage::Deserialize(const std::span<const std::uint8_t>& data)
+std::span<const std::uint8_t> WhackAStoodentServer::Messages::AuthenticateMessage::Deserialize(std::span<const std::uint8_t> data)
 {
-	std::span<std::uint8_t const> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Authenticate>::Deserialize(data));
+	std::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Authenticate>::Deserialize(data));
 	next_bytes = WhackAStoodentServer::UUIDs::DeserializeUUID(next_bytes, userID);
 	return WhackAStoodentServer::StringSerializer::DeserializeByteSizedString(next_bytes, username);
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -108,7 +109,7 @@ namespace WhackAStoodentServer
 		/// Sends a peer message
 		/// </summary>
 		/// <param name="data">Data</param>
-		virtual void SendPeerMessage(const std::vector<uint8_t>& data);
+		virtual void SendPeerMessage(std::span<const std::uint8_t> data);
 
 		/// <summary>
 		/// Disconnects peer

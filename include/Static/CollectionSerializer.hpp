@@ -35,7 +35,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Serialized collection</returns>
 		template <typename TElement, typename TLength>
-		static std::vector<std::uint8_t>& Serialize(const std::span<const TElement>& collection, std::vector<std::uint8_t>& result)
+		static std::vector<std::uint8_t>& Serialize(std::span<const TElement> collection, std::vector<std::uint8_t>& result)
 		{
 			static_assert
 			(
@@ -66,7 +66,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Serialized collection</returns>
 		template <typename TElement, typename TLength>
-		static std::vector<std::uint8_t>& Serialize(const std::span<const std::shared_ptr<TElement>>& collection, std::vector<std::uint8_t>& result)
+		static std::vector<std::uint8_t>& Serialize(std::span<const std::shared_ptr<TElement>> collection, std::vector<std::uint8_t>& result)
 		{
 			static_assert
 			(
@@ -96,7 +96,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Serialized collection</returns>
 		template <typename TElement>
-		static inline std::vector<std::uint8_t>& SerializeByteSizedCollection(const std::span<const TElement>& collection, std::vector<std::uint8_t>& result)
+		static inline std::vector<std::uint8_t>& SerializeByteSizedCollection(std::span<const TElement> collection, std::vector<std::uint8_t>& result)
 		{
 			return Serialize<TElement, std::uint8_t>(collection, result);
 		}
@@ -109,7 +109,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Serialized collection</returns>
 		template <typename TElement>
-		static inline std::vector<std::uint8_t>& SerializeByteSizedCollection(const std::span<const std::shared_ptr<TElement>>& collection, std::vector<std::uint8_t>& result)
+		static inline std::vector<std::uint8_t>& SerializeByteSizedCollection(std::span<const std::shared_ptr<TElement>> collection, std::vector<std::uint8_t>& result)
 		{
 			return Serialize<TElement, std::uint8_t>(collection, result);
 		}
@@ -122,7 +122,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Serialized collection</returns>
 		template <typename TElement>
-		static inline std::vector<std::uint8_t>& SerializeShortSizedCollection(const std::span<const TElement>& collection, std::vector<std::uint8_t>& result)
+		static inline std::vector<std::uint8_t>& SerializeShortSizedCollection(std::span<const TElement> collection, std::vector<std::uint8_t>& result)
 		{
 			return Serialize<TElement, std::uint16_t>(collection, result);
 		}
@@ -135,7 +135,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Serialized collection</returns>
 		template <typename TElement>
-		static inline std::vector<std::uint8_t>& SerializeShortSizedCollection(const std::span<const std::shared_ptr<TElement>>& collection, std::vector<std::uint8_t>& result)
+		static inline std::vector<std::uint8_t>& SerializeShortSizedCollection(std::span<const std::shared_ptr<TElement>> collection, std::vector<std::uint8_t>& result)
 		{
 			return Serialize<TElement, std::uint16_t>(collection, result);
 		}
@@ -148,7 +148,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Serialized collection</returns>
 		template <typename TElement>
-		static inline std::vector<std::uint8_t>& SerializeIntegerSizedCollection(const std::span<const TElement>& collection, std::vector<std::uint8_t>& result)
+		static inline std::vector<std::uint8_t>& SerializeIntegerSizedCollection(std::span<const TElement> collection, std::vector<std::uint8_t>& result)
 		{
 			return Serialize<TElement, std::uint32_t>(collection, result);
 		}
@@ -161,7 +161,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Serialized collection</returns>
 		template <typename TElement>
-		static inline std::vector<std::uint8_t>& SerializeIntegerSizedCollection(const std::span<const std::shared_ptr<TElement>>& collection, std::vector<std::uint8_t>& result)
+		static inline std::vector<std::uint8_t>& SerializeIntegerSizedCollection(std::span<const std::shared_ptr<TElement>> collection, std::vector<std::uint8_t>& result)
 		{
 			return Serialize<TElement, std::uint32_t>(collection, result);
 		}
@@ -174,7 +174,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Serialized collection</returns>
 		template <typename TElement>
-		static inline std::vector<std::uint8_t>& SerializeLongSizedCollection(const std::span<const TElement>& collection, std::vector<std::uint8_t>& result)
+		static inline std::vector<std::uint8_t>& SerializeLongSizedCollection(std::span<const TElement> collection, std::vector<std::uint8_t>& result)
 		{
 			return Serialize<TElement, std::uint64_t>(collection, result);
 		}
@@ -187,7 +187,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Serialized collection</returns>
 		template <typename TElement>
-		static inline std::vector<std::uint8_t>& SerializeLongSizedCollection(const std::span<const std::shared_ptr<TElement>>& collection, std::vector<std::uint8_t>& result)
+		static inline std::vector<std::uint8_t>& SerializeLongSizedCollection(std::span<const std::shared_ptr<TElement>> collection, std::vector<std::uint8_t>& result)
 		{
 			return Serialize<TElement, std::uint64_t>(collection, result);
 		}
@@ -201,7 +201,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
 		template <typename TElement, typename TLength>
-		static std::span<const std::uint8_t> Deserialize(const std::span<const std::uint8_t>& bytes, std::vector<TElement>& result)
+		static std::span<const std::uint8_t> Deserialize(std::span<const std::uint8_t> bytes, std::vector<TElement>& result)
 		{
 			static_assert
 			(
@@ -232,7 +232,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
 		template <typename TElement, typename TLength>
-		static std::span<const std::uint8_t> Deserialize(const std::span<const std::uint8_t>& bytes, std::vector<std::shared_ptr<TElement>>& result)
+		static std::span<const std::uint8_t> Deserialize(std::span<const std::uint8_t> bytes, std::vector<std::shared_ptr<TElement>>& result)
 		{
 			static_assert
 			(
@@ -263,7 +263,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
 		template <typename TElement>
-		static inline std::span<const std::uint8_t> DeserializeByteSizedCollection(const std::span<const std::uint8_t>& bytes, std::vector<TElement>& result)
+		static inline std::span<const std::uint8_t> DeserializeByteSizedCollection(std::span<const std::uint8_t> bytes, std::vector<TElement>& result)
 		{
 			return Deserialize<TElement, std::uint8_t>(bytes, result);
 		}
@@ -276,7 +276,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
 		template <typename TElement>
-		static inline std::span<const std::uint8_t> DeserializeByteSizedCollection(const std::span<const std::uint8_t>& bytes, std::vector<std::shared_ptr<TElement>>& result)
+		static inline std::span<const std::uint8_t> DeserializeByteSizedCollection(std::span<const std::uint8_t> bytes, std::vector<std::shared_ptr<TElement>>& result)
 		{
 			return Deserialize<TElement, std::uint8_t>(bytes, result);
 		}
@@ -289,7 +289,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
 		template <typename TElement>
-		static inline std::span<const std::uint8_t> DeserializeShortSizedCollection(const std::span<const std::uint8_t>& bytes, std::vector<TElement>& result)
+		static inline std::span<const std::uint8_t> DeserializeShortSizedCollection(std::span<const std::uint8_t> bytes, std::vector<TElement>& result)
 		{
 			return Deserialize<TElement, std::uint16_t>(bytes, result);
 		}
@@ -302,7 +302,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
 		template <typename TElement>
-		static inline std::span<const std::uint8_t> DeserializeShortSizedCollection(const std::span<const std::uint8_t>& bytes, std::vector<std::shared_ptr<TElement>>& result)
+		static inline std::span<const std::uint8_t> DeserializeShortSizedCollection(std::span<const std::uint8_t> bytes, std::vector<std::shared_ptr<TElement>>& result)
 		{
 			return Deserialize<TElement, std::uint16_t>(bytes, result);
 		}
@@ -315,7 +315,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
 		template <typename TElement>
-		static inline std::span<const std::uint8_t> DeserializeIntegerSizedCollection(const std::span<const std::uint8_t>& bytes, std::vector<TElement>& result)
+		static inline std::span<const std::uint8_t> DeserializeIntegerSizedCollection(std::span<const std::uint8_t> bytes, std::vector<TElement>& result)
 		{
 			return Deserialize<TElement, std::uint32_t>(bytes, result);
 		}
@@ -328,7 +328,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
 		template <typename TElement>
-		static inline std::span<const std::uint8_t> DeserializeIntegerSizedCollection(const std::span<const std::uint8_t>& bytes, std::vector<std::shared_ptr<TElement>>& result)
+		static inline std::span<const std::uint8_t> DeserializeIntegerSizedCollection(std::span<const std::uint8_t> bytes, std::vector<std::shared_ptr<TElement>>& result)
 		{
 			return Deserialize<TElement, std::uint32_t>(bytes, result);
 		}
@@ -341,7 +341,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
 		template <typename TElement>
-		static inline std::span<const std::uint8_t> DeserializeLongSizedCollection(const std::span<const std::uint8_t>& bytes, std::vector<TElement>& result)
+		static inline std::span<const std::uint8_t> DeserializeLongSizedCollection(std::span<const std::uint8_t> bytes, std::vector<TElement>& result)
 		{
 			return Deserialize<TElement, std::uint64_t>(bytes, result);
 		}
@@ -354,7 +354,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
 		template <typename TElement>
-		static inline std::span<const std::uint8_t> DeserializeLongSizedCollection(const std::span<const std::uint8_t>& bytes, std::vector<std::shared_ptr<TElement>>& result)
+		static inline std::span<const std::uint8_t> DeserializeLongSizedCollection(std::span<const std::uint8_t> bytes, std::vector<std::shared_ptr<TElement>>& result)
 		{
 			return Deserialize<TElement, std::uint64_t>(bytes, result);
 		}

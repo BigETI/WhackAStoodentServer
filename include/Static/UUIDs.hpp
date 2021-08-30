@@ -49,7 +49,7 @@ namespace WhackAStoodentServer
 		/// <param name="bytes">Data</param>
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
-		static std::span<std::uint8_t const> DeserializeUUID(const std::span<std::uint8_t const>& bytes, uuids::uuid& result);
+		static std::span<const std::uint8_t> DeserializeUUID(std::span<const std::uint8_t> bytes, uuids::uuid& result);
 
 		UUIDs& operator=(const UUIDs&) = delete;
 		UUIDs& operator=(UUIDs&&) = delete;

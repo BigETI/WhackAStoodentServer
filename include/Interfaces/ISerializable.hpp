@@ -28,6 +28,6 @@ namespace WhackAStoodentServer
 		/// </summary>
 		/// <param name="data">Data to deserialize</param>
 		/// <returns>Remaining data to deserialize</returns>
-		virtual std::span<std::uint8_t const> Deserialize(const std::span<std::uint8_t const>& data) = 0;
+		virtual std::span<const std::uint8_t> Deserialize(std::span<const std::uint8_t> data) = 0;
 	};
 }
