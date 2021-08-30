@@ -188,6 +188,11 @@ namespace WhackAStoodentServer
 		std::unordered_map<EMessageType, std::forward_list<std::shared_ptr<IMessageParser>>> messageParserLists;
 
 		/// <summary>
+		/// Outgoing messages
+		/// </summary>
+		ConcurrentQueue<std::pair<std::shared_ptr<Peer>, std::shared_ptr<Message>>> outgoingMessages;
+
+		/// <summary>
 		/// Networking thread
 		/// </summary>
 		/// <param name="server">Server</param>

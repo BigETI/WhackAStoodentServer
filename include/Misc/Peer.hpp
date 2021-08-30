@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 #include <span>
 #include <string>
 #include <string_view>
@@ -53,6 +54,11 @@ namespace WhackAStoodentServer
 		Event<std::shared_ptr<Message>> OnMessageReceived;
 
 		/// <summary>
+		/// Gets invoked when a message has been sent to this peer
+		/// </summary>
+		Event<std::shared_ptr<Message>> OnMessageSent;
+
+		/// <summary>
 		/// Gets invoked when an error has been received
 		/// </summary>
 		Event<EErrorType, std::wstring_view> OnErrorReceived;
@@ -89,6 +95,12 @@ namespace WhackAStoodentServer
 		/// </summary>
 		/// <returns>IP address string</returns>
 		virtual std::string_view GetIPAddressString() const;
+
+		/// <summary>
+		/// Gets the ENet peer
+		/// </summary>
+		/// <returns>ENet peer</returns>
+		virtual ENetPeer* GetPeer() const;
 
 		/// <summary>
 		/// Sends message to peer

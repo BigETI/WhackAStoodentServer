@@ -22,7 +22,7 @@ namespace WhackAStoodentServer
 		/// <summary>
 		/// Default timeout time
 		/// </summary>
-		static constexpr const std::uint32_t TimeoutTime = static_cast<const std::uint32_t>(3000);
+		static constexpr const std::uint32_t TimeoutTime = static_cast<const std::uint32_t>(100);
 
 		/// <summary>
 		/// Default tick count per second

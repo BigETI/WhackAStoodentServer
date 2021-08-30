@@ -4,6 +4,7 @@
 #include <Enumerators/EMessageType.hpp>
 #include <Enumerators/EPlayerRole.hpp>
 #include <Exceptions/ENetInitializationFailedException.hpp>
+#include <Exceptions/ENetPeerSendFailedException.hpp>
 #include <Exceptions/InvalidNetworkPortException.hpp>
 #include <Messages/AcceptPlayRequestMessage.hpp>
 #include <Messages/AuthenticateMessage.hpp>
@@ -420,6 +421,10 @@ bool WhackAStoodentServer::Server::ProcessMessages()
 					std::cout << "Peer ID " << peer->GetIncomingPeerID() << " with IP " << peer->GetIPAddressString() << " has been disconnected." << std::endl;
 					OnPeerDisconnected(peer);
 				};
+				peer->OnMessageSent += [&, peer](std::shared_ptr<WhackAStoodentServer::Message> message)
+				{
+					outgoingMessages.Enqueue(std::make_pair(peer, message));
+				};
 				peer->OnConnectionAttempted();
 				if (bans.IsIPAddressBanned(peer->GetIPAddressString()))
 				{
@@ -525,9 +530,19 @@ void WhackAStoodentServer::Server::NetworkingThread(Server* server)
 	if (server->enetHost)
 	{
 		ENetEvent enet_event;
+		std::pair<std::shared_ptr<WhackAStoodentServer::Peer>, std::shared_ptr<WhackAStoodentServer::Message>> outgoing_message;
 		bool is_polling;
 		while (server->isNetworkingThreadRunning)
 		{
+			while (server->outgoingMessages.TryDequeue(outgoing_message))
+			{
+				ENetPacket* packet(enet_packet_create(outgoing_message.second->GetData().data(), outgoing_message.second->GetData().size(), ENET_PACKET_FLAG_RELIABLE));
+				int error_code(enet_peer_send(outgoing_message.first->GetPeer(), 0, packet));
+				if (error_code)
+				{
+					throw WhackAStoodentServer::ENetPeerSendFailedException(outgoing_message.first.get(), error_code);
+				}
+			}
 			is_polling = true;
 			while (is_polling)
 			{

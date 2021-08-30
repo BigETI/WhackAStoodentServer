@@ -1,6 +1,5 @@
 #include <stdexcept>
 
-#include <Exceptions/ENetPeerSendFailedException.hpp>
 #include <Misc/Peer.hpp>
 #include <Static/IPUtilities.hpp>
 
@@ -53,17 +52,21 @@ std::string_view WhackAStoodentServer::Peer::GetIPAddressString() const
 }
 
 /// <summary>
+/// Gets the ENet peer
+/// </summary>
+/// <returns>ENet peer</returns>
+ENetPeer* WhackAStoodentServer::Peer::GetPeer() const
+{
+	return peer;
+}
+
+/// <summary>
 /// Sends a peer message
 /// </summary>
 /// <param name="data">Data</param>
 void WhackAStoodentServer::Peer::SendPeerMessage(std::span<const std::uint8_t> data)
 {
-	ENetPacket* packet(enet_packet_create(data.data(), data.size(), ENET_PACKET_FLAG_RELIABLE));
-	int error_code(enet_peer_send(peer, 0, packet));
-	if (error_code)
-	{
-		throw ENetPeerSendFailedException(this, error_code);
-	}
+	OnMessageSent(std::make_shared<WhackAStoodentServer::Message>(data));
 }
 
 /// <summary>
@@ -75,12 +78,12 @@ void WhackAStoodentServer::Peer::Disconnect(WhackAStoodentServer::EDisconnection
 	std::uint32_t data(static_cast<std::uint32_t>(reason));
 	switch (reason)
 	{
-	case EDisconnectionReason::NoReason:
+	case WhackAStoodentServer::EDisconnectionReason::NoReason:
 		enet_peer_disconnect(peer, data);
 		break;
-	case EDisconnectionReason::Kicked:
-	case EDisconnectionReason::Banned:
-	case EDisconnectionReason::Stopped:
+	case WhackAStoodentServer::EDisconnectionReason::Kicked:
+	case WhackAStoodentServer::EDisconnectionReason::Banned:
+	case WhackAStoodentServer::EDisconnectionReason::Stopped:
 		enet_peer_disconnect_now(peer, data);
 		break;
 	}
