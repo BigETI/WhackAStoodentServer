@@ -54,7 +54,7 @@ namespace WhackAStoodentServer
 		/// <summary>
 		/// Looking tick time
 		/// </summary>
-		static constexpr const std::chrono::milliseconds LookingTickTime = static_cast<const std::chrono::milliseconds>(500);
+		static constexpr const std::chrono::milliseconds LookingTickTime = static_cast<const std::chrono::milliseconds>(800);
 
 		Rules() = delete;
 		Rules(const Rules&) = delete;
