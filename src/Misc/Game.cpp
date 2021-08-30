@@ -210,7 +210,7 @@ bool WhackAStoodentServer::Game::Look(std::size_t holeIndex)
 	{
 		throw std::invalid_argument("Hole index is out of bounds.");
 	}
-	bool ret(lookingHoleIndex < 0);
+	bool ret(lookingHoleIndex != holeIndex);
 	if (ret)
 	{
 		lookingHoleIndex = static_cast<int>(holeIndex);
