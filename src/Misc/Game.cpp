@@ -1,6 +1,7 @@
 #include <Messages/HideMessage.hpp>
 #include <Messages/HitFailMessage.hpp>
 #include <Messages/HitSuccessMessage.hpp>
+#include <Messages/LoadedGameMessage.hpp>
 #include <Messages/LookMessage.hpp>
 #include <Messages/ScoreMoleMessage.hpp>
 #include <Misc/Game.hpp>
@@ -126,6 +127,8 @@ bool WhackAStoodentServer::Game::StartGame()
 		isGameRunning = true;
 		hitterUser.first->SetScore(0L);
 		moleUser.first->SetScore(0L);
+		hitterUser.first->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::LoadedGameMessage>();
+		moleUser.first->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::LoadedGameMessage>();
 		OnGameStarted();
 	}
 	return ret;
