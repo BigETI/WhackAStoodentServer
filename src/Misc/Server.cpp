@@ -544,6 +544,7 @@ void WhackAStoodentServer::Server::NetworkingThread(Server* server)
 						server->connectedPeerQueue.Enqueue(enet_event.peer);
 						break;
 					case ENET_EVENT_TYPE_DISCONNECT:
+					case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
 						server->disconnectedPeerQueue.Enqueue(enet_event.peer->incomingPeerID);
 						break;
 					case ENET_EVENT_TYPE_RECEIVE:
