@@ -697,7 +697,7 @@ void WhackAStoodentServer::Server::AssertPeerIsAMole(std::shared_ptr<WhackAStood
 		peer,
 		[&](std::shared_ptr<WhackAStoodentServer::User> user, std::shared_ptr<WhackAStoodentServer::Game> game)
 		{
-			if (game->GetPlayerRole(user) == WhackAStoodentServer::EPlayerRole::Hitter)
+			if (game->GetPlayerRole(user) == WhackAStoodentServer::EPlayerRole::Mole)
 			{
 				onPeerIsAMole(user, game);
 			}
