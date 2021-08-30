@@ -47,7 +47,7 @@ namespace WhackAStoodentServer
 
 		static inline std::vector<std::uint8_t>& SerializeShortSizedString(const std::wstring& string, std::vector<std::uint8_t>& result)
 		{
-			return Serialize<std::uint32_t>(string, result);
+			return Serialize<std::uint16_t>(string, result);
 		}
 
 		static inline std::vector<std::uint8_t>& SerializeIntegerSizedString(const std::wstring& string, std::vector<std::uint8_t>& result)

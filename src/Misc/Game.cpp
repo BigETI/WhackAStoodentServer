@@ -259,6 +259,7 @@ void WhackAStoodentServer::Game::ProcessTick()
 				bool is_sending_mole_scored_message(false);
 				while (elapsed_look_tick_time >= WhackAStoodentServer::Rules::LookingTickTime)
 				{
+					lastLookingTickTimePoint += WhackAStoodentServer::Rules::LookingTickTime;
 					elapsed_look_tick_time -= WhackAStoodentServer::Rules::LookingTickTime;
 					moleUser->SetScore(moleUser->GetScore() + WhackAStoodentServer::Rules::LookingScorePerLookingTick);
 					is_sending_mole_scored_message = true;
