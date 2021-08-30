@@ -29,6 +29,7 @@ WhackAStoodentServer::Game::Game(const uuids::uuid& gameID, std::shared_ptr<Whac
 	hitterUser(hitterUser),
 	moleUser(moleUser),
 	isGameRunning(false),
+	isGameFinished(false),
 	gameStartedTimePoint(std::chrono::high_resolution_clock::now()),
 	lookingHoleIndex(-1)
 {
@@ -257,16 +258,19 @@ void WhackAStoodentServer::Game::ProcessTick()
 			{
 				std::chrono::nanoseconds elapsed_look_tick_time(std::chrono::high_resolution_clock::now() - lastLookingTickTimePoint);
 				bool is_sending_mole_scored_message(false);
+				std::int64_t mole_score(moleUser->GetScore());
 				while (elapsed_look_tick_time >= WhackAStoodentServer::Rules::LookingTickTime)
 				{
 					lastLookingTickTimePoint += WhackAStoodentServer::Rules::LookingTickTime;
 					elapsed_look_tick_time -= WhackAStoodentServer::Rules::LookingTickTime;
-					moleUser->SetScore(moleUser->GetScore() + WhackAStoodentServer::Rules::LookingScorePerLookingTick);
+					mole_score += WhackAStoodentServer::Rules::LookingScorePerLookingTick;
 					is_sending_mole_scored_message = true;
 				}
 				if (is_sending_mole_scored_message)
 				{
-					hitterUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::ScoreMoleMessage>(moleUser->GetScore());
+					moleUser->SetScore(mole_score);
+					hitterUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::ScoreMoleMessage>(mole_score);
+					moleUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::ScoreMoleMessage>(mole_score);
 				}
 			}
 		}

@@ -71,6 +71,7 @@ WhackAStoodentServer::Server::Server(std::uint16_t port, std::uint32_t timeoutTi
 			}
 			else if (!user_id.is_nil() && lobby.IsUserIDOccupied(user_id))
 			{
+				std::cout << user_id << std::endl;
 				peer->SendPeerMessage<WhackAStoodentServer::Messages::ErrorMessage>(EErrorType::Internal, L"User ID is already occupied.");
 			}
 			else

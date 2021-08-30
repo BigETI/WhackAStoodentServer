@@ -59,7 +59,7 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::AuthenticateMessage::
 {
 	WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Authenticate>::Serialize(result);
 	WhackAStoodentServer::UUIDs::SerializeUUID(userID, result);
-	return WhackAStoodentServer::StringSerializer::Serialize<std::uint8_t>(username, result);
+	return WhackAStoodentServer::StringSerializer::SerializeByteSizedString(username, result);
 }
 
 /// <summary>
