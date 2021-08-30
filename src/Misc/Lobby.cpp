@@ -253,9 +253,9 @@ bool WhackAStoodentServer::Lobby::AddUserToSearch(std::shared_ptr<WhackAStoodent
 	if (ret)
 	{
 		bool is_added_to_search(true);
-		for (const std::shared_ptr<User>& game_searching_user : gameSearchingUsers)
+		for (std::shared_ptr<User> game_searching_user : gameSearchingUsers)
 		{
-			if ((game_searching_user != user) && !game_searching_user->IsUserBlocked(user) && user->IsUserBlocked(game_searching_user))
+			if ((game_searching_user != user) && !game_searching_user->IsUserBlocked(user) && !user->IsUserBlocked(game_searching_user))
 			{
 				gameSearchingUsers.remove(game_searching_user);
 				gameSearchingUsers.remove(user);

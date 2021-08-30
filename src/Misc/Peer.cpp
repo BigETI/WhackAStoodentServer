@@ -75,6 +75,7 @@ void WhackAStoodentServer::Peer::SendPeerMessage(std::span<const std::uint8_t> d
 /// <param name="reason">Disconnection reason</param>
 void WhackAStoodentServer::Peer::Disconnect(WhackAStoodentServer::EDisconnectionReason reason)
 {
+	// TODO: Enqueue this!
 	std::uint32_t data(static_cast<std::uint32_t>(reason));
 	switch (reason)
 	{
