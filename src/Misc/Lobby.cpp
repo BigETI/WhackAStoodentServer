@@ -96,7 +96,6 @@ bool WhackAStoodentServer::Lobby::RemoveUser(std::shared_ptr<WhackAStoodentServe
 		if (user_id_to_game_lookup_iterator != userIDToGameLookup.end())
 		{
 			user_id_to_game_lookup_iterator->second->FinishGame();
-			userIDToGameLookup.erase(user_id_to_game_lookup_iterator);
 		}
 		gameSearchingUsers.remove(user);
 		sessionCodeToUserLookup.erase(std::string(user->GetSessionCode()));
