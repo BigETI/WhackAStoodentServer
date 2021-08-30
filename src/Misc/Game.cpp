@@ -185,19 +185,23 @@ WhackAStoodentServer::EPlayerRole WhackAStoodentServer::Game::GetPlayerRole(std:
 /// <returns>"true" if hitting was successful, otherwise "false"</returns>
 bool WhackAStoodentServer::Game::Hit(const WhackAStoodentServer::Vector2D<float>& position)
 {
-	bool ret((lookingHoleIndex >= 0) && ((std::chrono::high_resolution_clock::now() - lastHitTimePoint) >= WhackAStoodentServer::Rules::HittingCooldownTime) && Holes[lookingHoleIndex].IsPositionInHole(position));
+	bool ret((std::chrono::high_resolution_clock::now() - lastHitTimePoint) >= WhackAStoodentServer::Rules::HittingCooldownTime);
 	if (ret)
 	{
-		std::int64_t new_score(hitterUser->GetScore() + WhackAStoodentServer::Rules::HittingScore);
-		lookingHoleIndex = -1;
-		hitterUser->SetScore(new_score);
-		hitterUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HitSuccessMessage>(static_cast<std::size_t>(lookingHoleIndex), new_score, position);
-		moleUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HitSuccessMessage>(static_cast<std::size_t>(lookingHoleIndex), new_score, position);
-	}
-	else
-	{
-		hitterUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HitFailMessage>(position);
-		moleUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HitFailMessage>(position);
+		ret = (lookingHoleIndex >= 0) && Holes[lookingHoleIndex].IsPositionInHole(position);
+		if (ret)
+		{
+			std::int64_t new_score(hitterUser->GetScore() + WhackAStoodentServer::Rules::HittingScore);
+			lookingHoleIndex = -1;
+			hitterUser->SetScore(new_score);
+			hitterUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HitSuccessMessage>(static_cast<std::size_t>(lookingHoleIndex), new_score, position);
+			moleUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HitSuccessMessage>(static_cast<std::size_t>(lookingHoleIndex), new_score, position);
+		}
+		else
+		{
+			hitterUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HitFailMessage>(position);
+			moleUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::HitFailMessage>(position);
+		}
 	}
 	return ret;
 }
