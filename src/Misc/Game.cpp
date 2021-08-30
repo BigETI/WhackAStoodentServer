@@ -147,7 +147,7 @@ bool WhackAStoodentServer::Game::FinishGame()
 		isGameFinished = true;
 		hitterUser.first->SetGameLoadedState(false);
 		moleUser.first->SetGameLoadedState(false);
-		OnGameStopped();
+		OnGameFinished();
 	}
 	return ret;
 }

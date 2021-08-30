@@ -499,7 +499,15 @@ void WhackAStoodentServer::Lobby::CreateGame(std::shared_ptr<WhackAStoodentServe
 	std::shared_ptr<WhackAStoodentServer::User> mole_user(is_swapped ? firstUser : secondUser);
 	uuids::uuid game_id;
 	while (games.contains(WhackAStoodentServer::UUIDs::CreateNewUUID(game_id)));
-	games.insert_or_assign(game_id, std::make_shared<WhackAStoodentServer::Game>(game_id, hitter_user, mole_user));
+	std::shared_ptr<WhackAStoodentServer::Game> game(std::make_shared<WhackAStoodentServer::Game>(game_id, hitter_user, mole_user));
+	game->OnGameFinished += [&, game, hitter_user, mole_user]()
+	{
+		userIDToGameLookup.erase(hitter_user->GetUserID());
+		userIDToGameLookup.erase(mole_user->GetUserID());
+	};
+	games.insert_or_assign(game_id, game);
+	userIDToGameLookup.insert_or_assign(hitter_user->GetUserID(), game);
+	userIDToGameLookup.insert_or_assign(mole_user->GetUserID(), game);
 	hitter_user->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::StartedGameMessage>(WhackAStoodentServer::EPlayerRole::Hitter, mole_user->GetUsername());
 	mole_user->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::StartedGameMessage>(WhackAStoodentServer::EPlayerRole::Mole, hitter_user->GetUsername());
 }

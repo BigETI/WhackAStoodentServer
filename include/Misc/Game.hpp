@@ -35,9 +35,9 @@ namespace WhackAStoodentServer
 		Event<> OnGameStarted;
 
 		/// <summary>
-		/// Used to invoke when game has been stopped
+		/// Used to invoke when game has been finished
 		/// </summary>
-		Event<> OnGameStopped;
+		Event<> OnGameFinished;
 
 		Game() = delete;
 
