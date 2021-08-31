@@ -1,0 +1,6 @@
+[submodule "dependencies/cmake-conan"]
+	path = dependencies/cmake-conan
+	url = https://github.com/conan-io/cmake-conan.git
+[submodule "dependencies/stduuid"]
+	path = dependencies/stduuid
+	url = https://github.com/mariusbancila/stduuid.git
