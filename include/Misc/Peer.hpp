@@ -2,12 +2,12 @@
 
 #include <cstdint>
 #include <memory>
-#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include <enet.h>
+#include <span.hpp>
 
 #include <Enumerators/EDisconnectionReason.hpp>
 #include <Enumerators/EErrorType.hpp>
@@ -121,7 +121,7 @@ namespace WhackAStoodentServer
 		/// Sends a peer message
 		/// </summary>
 		/// <param name="data">Data</param>
-		virtual void SendPeerMessage(std::span<const std::uint8_t> data);
+		virtual void SendPeerMessage(nonstd::span<const std::uint8_t> data);
 
 		/// <summary>
 		/// Disconnects peer

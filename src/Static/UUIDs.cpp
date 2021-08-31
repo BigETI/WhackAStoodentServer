@@ -29,7 +29,7 @@ std::vector<std::uint8_t>& WhackAStoodentServer::UUIDs::SerializeUUID(const uuid
 {
 	std::size_t offset(result.size());
 	result.resize(offset + DataSize);
-	std::memcpy(result.data() + offset, uuid.as_bytes().data(), DataSize);
+	memcpy(result.data() + offset, uuid.as_bytes().data(), DataSize);
 	return result;
 }
 
@@ -39,7 +39,7 @@ std::vector<std::uint8_t>& WhackAStoodentServer::UUIDs::SerializeUUID(const uuid
 /// <param name="bytes">Data</param>
 /// <param name="result">Result</param>
 /// <returns>Remaining data to be deserialized</returns>
-std::span<const std::uint8_t> WhackAStoodentServer::UUIDs::DeserializeUUID(std::span<const std::uint8_t> bytes, uuids::uuid& result)
+nonstd::span<const std::uint8_t> WhackAStoodentServer::UUIDs::DeserializeUUID(nonstd::span<const std::uint8_t> bytes, uuids::uuid& result)
 {
 	if (bytes.size() < DataSize)
 	{

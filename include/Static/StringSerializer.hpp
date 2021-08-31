@@ -2,9 +2,11 @@
 
 #include <string>
 #include <string_view>
-#include <span>
 #include <type_traits>
 #include <vector>
+
+#include <span.hpp>
+#include <string.h>
 
 #include <Exceptions/DeserializationFailedException.hpp>
 #include <Static/NumericSerializer.hpp>
@@ -47,8 +49,8 @@ namespace WhackAStoodentServer
 			TLength string_length(static_cast<TLength>(string.length() & ~static_cast<TLength>(0)));
 			std::size_t offset = result.size();
 			result.resize(offset + sizeof(TLength) + (static_cast<std::size_t>(string_length) * sizeof(TCharacter)));
-			std::memcpy(result.data() + offset, &string_length, sizeof(TLength));
-			std::memcpy(result.data() + offset + sizeof(TLength), string.data(), static_cast<std::size_t>(string_length) * sizeof(TCharacter));
+			memcpy(result.data() + offset, &string_length, sizeof(TLength));
+			memcpy(result.data() + offset + sizeof(TLength), string.data(), static_cast<std::size_t>(string_length) * sizeof(TCharacter));
 			return result;
 		}
 
@@ -201,7 +203,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
 		template <typename TLength, typename TCharacter>
-		static std::span<const std::uint8_t> Deserialize(std::span<const std::uint8_t> bytes, std::basic_string<TCharacter>& result)
+		static nonstd::span<const std::uint8_t> Deserialize(nonstd::span<const std::uint8_t> bytes, std::basic_string<TCharacter>& result)
 		{
 			static_assert
 			(
@@ -211,7 +213,7 @@ namespace WhackAStoodentServer
 				std::is_same<std::uint64_t, TLength>::value
 			);
 			TLength string_length;
-			std::span<const std::uint8_t> next_bytes(NumericSerializer::Deserialize<TLength>(bytes, string_length));
+			nonstd::span<const std::uint8_t> next_bytes(NumericSerializer::Deserialize<TLength>(bytes, string_length));
 			std::size_t length(static_cast<std::size_t>(string_length));
 			std::size_t size(length * sizeof(TCharacter));
 			if (next_bytes.size() < size)
@@ -219,7 +221,7 @@ namespace WhackAStoodentServer
 				throw DeserializationFailedException();
 			}
 			result.resize(length);
-			std::memcpy(result.data(), next_bytes.data(), size);
+			memcpy(result.data(), next_bytes.data(), size);
 			return next_bytes.subspan(size, next_bytes.size() - size);
 		}
 
@@ -231,7 +233,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
 		template <typename TCharacter>
-		static inline std::span<const std::uint8_t> DeserializeByteSizedString(std::span<const std::uint8_t> bytes, std::basic_string<TCharacter>& result)
+		static inline nonstd::span<const std::uint8_t> DeserializeByteSizedString(nonstd::span<const std::uint8_t> bytes, std::basic_string<TCharacter>& result)
 		{
 			return Deserialize<std::uint8_t, TCharacter>(bytes, result);
 		}
@@ -242,7 +244,7 @@ namespace WhackAStoodentServer
 		/// <param name="bytes">Data</param>
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
-		static inline std::span<const std::uint8_t> DeserializeByteSizedString(std::span<const std::uint8_t> bytes, std::string& result)
+		static inline nonstd::span<const std::uint8_t> DeserializeByteSizedString(nonstd::span<const std::uint8_t> bytes, std::string& result)
 		{
 			return DeserializeByteSizedString<std::string::value_type>(bytes, result);
 		}
@@ -253,7 +255,7 @@ namespace WhackAStoodentServer
 		/// <param name="bytes">Data</param>
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
-		static inline std::span<const std::uint8_t> DeserializeByteSizedString(std::span<const std::uint8_t> bytes, std::wstring& result)
+		static inline nonstd::span<const std::uint8_t> DeserializeByteSizedString(nonstd::span<const std::uint8_t> bytes, std::wstring& result)
 		{
 			return DeserializeByteSizedString<std::wstring::value_type>(bytes, result);
 		}
@@ -266,7 +268,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
 		template <typename TCharacter>
-		static inline std::span<const std::uint8_t> DeserializeShortSizedString(std::span<const std::uint8_t> bytes, std::basic_string<TCharacter>& result)
+		static inline nonstd::span<const std::uint8_t> DeserializeShortSizedString(nonstd::span<const std::uint8_t> bytes, std::basic_string<TCharacter>& result)
 		{
 			return Deserialize<std::uint16_t, TCharacter>(bytes, result);
 		}
@@ -277,7 +279,7 @@ namespace WhackAStoodentServer
 		/// <param name="bytes">Data</param>
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
-		static inline std::span<const std::uint8_t> DeserializeShortSizedString(std::span<const std::uint8_t> bytes, std::string& result)
+		static inline nonstd::span<const std::uint8_t> DeserializeShortSizedString(nonstd::span<const std::uint8_t> bytes, std::string& result)
 		{
 			return DeserializeShortSizedString<std::string::value_type>(bytes, result);
 		}
@@ -288,7 +290,7 @@ namespace WhackAStoodentServer
 		/// <param name="bytes">Data</param>
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
-		static inline std::span<const std::uint8_t> DeserializeShortSizedString(std::span<const std::uint8_t> bytes, std::wstring& result)
+		static inline nonstd::span<const std::uint8_t> DeserializeShortSizedString(nonstd::span<const std::uint8_t> bytes, std::wstring& result)
 		{
 			return DeserializeShortSizedString<std::wstring::value_type>(bytes, result);
 		}
@@ -301,7 +303,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
 		template <typename TCharacter>
-		static inline std::span<const std::uint8_t> DeserializeIntegerSizedString(std::span<const std::uint8_t> bytes, std::basic_string<TCharacter>& result)
+		static inline nonstd::span<const std::uint8_t> DeserializeIntegerSizedString(nonstd::span<const std::uint8_t> bytes, std::basic_string<TCharacter>& result)
 		{
 			return Deserialize<std::uint32_t, TCharacter>(bytes, result);
 		}
@@ -312,7 +314,7 @@ namespace WhackAStoodentServer
 		/// <param name="bytes">Data</param>
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
-		static inline std::span<const std::uint8_t> DeserializeIntegerSizedString(std::span<const std::uint8_t> bytes, std::string& result)
+		static inline nonstd::span<const std::uint8_t> DeserializeIntegerSizedString(nonstd::span<const std::uint8_t> bytes, std::string& result)
 		{
 			return DeserializeIntegerSizedString<std::string::value_type>(bytes, result);
 		}
@@ -323,7 +325,7 @@ namespace WhackAStoodentServer
 		/// <param name="bytes">Data</param>
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
-		static inline std::span<const std::uint8_t> DeserializeIntegerSizedString(std::span<const std::uint8_t> bytes, std::wstring& result)
+		static inline nonstd::span<const std::uint8_t> DeserializeIntegerSizedString(nonstd::span<const std::uint8_t> bytes, std::wstring& result)
 		{
 			return DeserializeIntegerSizedString<std::wstring::value_type>(bytes, result);
 		}
@@ -336,7 +338,7 @@ namespace WhackAStoodentServer
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
 		template <typename TCharacter>
-		static inline std::span<const std::uint8_t> DeserializeLongSizedString(std::span<const std::uint8_t> bytes, std::basic_string<TCharacter>& result)
+		static inline nonstd::span<const std::uint8_t> DeserializeLongSizedString(nonstd::span<const std::uint8_t> bytes, std::basic_string<TCharacter>& result)
 		{
 			return Deserialize<std::uint64_t, TCharacter>(bytes, result);
 		}
@@ -347,7 +349,7 @@ namespace WhackAStoodentServer
 		/// <param name="bytes">Data</param>
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
-		static inline std::span<const std::uint8_t> DeserializeLongSizedString(std::span<const std::uint8_t> bytes, std::string& result)
+		static inline nonstd::span<const std::uint8_t> DeserializeLongSizedString(nonstd::span<const std::uint8_t> bytes, std::string& result)
 		{
 			return DeserializeLongSizedString<std::string::value_type>(bytes, result);
 		}
@@ -358,7 +360,7 @@ namespace WhackAStoodentServer
 		/// <param name="bytes">Data</param>
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
-		static inline std::span<const std::uint8_t> DeserializeLongSizedString(std::span<const std::uint8_t> bytes, std::wstring& result)
+		static inline nonstd::span<const std::uint8_t> DeserializeLongSizedString(nonstd::span<const std::uint8_t> bytes, std::wstring& result)
 		{
 			return DeserializeLongSizedString<std::wstring::value_type>(bytes, result);
 		}

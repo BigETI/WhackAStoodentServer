@@ -26,7 +26,7 @@ WhackAStoodentServer::Bans::~Bans()
 /// <returns>"true" if IPv4 address is banned, otherwise "false"</returns>
 bool WhackAStoodentServer::Bans::IsIPAddressBanned(std::string_view ipAddress) const
 {
-	return bannedIPAddresses.contains(std::string(ipAddress));
+	return bannedIPAddresses.find(std::string(ipAddress)) != bannedIPAddresses.end();
 }
 
 /// <summary>
@@ -37,7 +37,7 @@ bool WhackAStoodentServer::Bans::IsIPAddressBanned(std::string_view ipAddress) c
 bool WhackAStoodentServer::Bans::BanIPAddress(std::string_view ipAddress)
 {
 	std::string ip_address(ipAddress);
-	bool ret(WhackAStoodentServer::IPUtilities::IsIPAddressStringValid(ipAddress) && !bannedIPAddresses.contains(ip_address));
+	bool ret(WhackAStoodentServer::IPUtilities::IsIPAddressStringValid(ipAddress) && (bannedIPAddresses.find(ip_address) == bannedIPAddresses.end()));
 	if (ret)
 	{
 		bannedIPAddresses.insert(ip_address);

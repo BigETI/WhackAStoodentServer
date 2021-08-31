@@ -146,10 +146,10 @@ std::vector<std::uint8_t>& WhackAStoodentServer::MatchHistoryEntry::Serialize(st
 /// </summary>
 /// <param name="data">Data to deserialize</param>
 /// <returns>Remaining data to deserialize</returns>
-std::span<const std::uint8_t> WhackAStoodentServer::MatchHistoryEntry::Deserialize(std::span<const std::uint8_t> data)
+nonstd::span<const std::uint8_t> WhackAStoodentServer::MatchHistoryEntry::Deserialize(nonstd::span<const std::uint8_t> data)
 {
 	std::uint8_t role;
-	std::span<const std::uint8_t> next_bytes(WhackAStoodentServer::NumericSerializer::DeserializeLong(data, yourScore));
+	nonstd::span<const std::uint8_t> next_bytes(WhackAStoodentServer::NumericSerializer::DeserializeLong(data, yourScore));
 	next_bytes = WhackAStoodentServer::NumericSerializer::DeserializeByte(next_bytes, role);
 	yourRole = static_cast<WhackAStoodentServer::EPlayerRole>(role);
 	next_bytes = WhackAStoodentServer::StringSerializer::DeserializeByteSizedString(next_bytes, yourName);

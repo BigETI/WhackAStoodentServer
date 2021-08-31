@@ -47,10 +47,10 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::LookMessage::Serializ
 /// </summary>
 /// <param name="data">Data to deserialize</param>
 /// <returns>Remaining data to deserialize</returns>
-std::span<const std::uint8_t> WhackAStoodentServer::Messages::LookMessage::Deserialize(std::span<const std::uint8_t> data)
+nonstd::span<const std::uint8_t> WhackAStoodentServer::Messages::LookMessage::Deserialize(nonstd::span<const std::uint8_t> data)
 {
 	std::uint8_t look_hole_index;
-	std::span<const std::uint8_t> ret(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Look>::Deserialize(data));
+	nonstd::span<const std::uint8_t> ret(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Look>::Deserialize(data));
 	ret = WhackAStoodentServer::NumericSerializer::DeserializeByte(ret, look_hole_index);
 	lookHole = static_cast<std::size_t>(look_hole_index);
 	return ret;

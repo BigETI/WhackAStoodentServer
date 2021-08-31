@@ -55,8 +55,8 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::PongMessage::Serializ
 /// </summary>
 /// <param name="data">Data to deserialize</param>
 /// <returns>Remaining data to deserialize</returns>
-std::span<const std::uint8_t> WhackAStoodentServer::Messages::PongMessage::Deserialize(std::span<const std::uint8_t> data)
+nonstd::span<const std::uint8_t> WhackAStoodentServer::Messages::PongMessage::Deserialize(nonstd::span<const std::uint8_t> data)
 {
-	std::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Pong>::Deserialize(data));
+	nonstd::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Pong>::Deserialize(data));
 	return NumericSerializer::DeserializeInteger(next_bytes, pongData);
 }

@@ -64,7 +64,7 @@ ENetPeer* WhackAStoodentServer::Peer::GetPeer() const
 /// Sends a peer message
 /// </summary>
 /// <param name="data">Data</param>
-void WhackAStoodentServer::Peer::SendPeerMessage(std::span<const std::uint8_t> data)
+void WhackAStoodentServer::Peer::SendPeerMessage(nonstd::span<const std::uint8_t> data)
 {
 	OnMessageSent(std::make_shared<WhackAStoodentServer::Message>(data));
 }

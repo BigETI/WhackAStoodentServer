@@ -150,7 +150,7 @@ void WhackAStoodentServer::User::SetScore(std::int64_t newScore)
 /// <returns>"true" if specified user has been blocked, otherwise "false</returns>
 bool WhackAStoodentServer::User::IsUserBlocked(std::shared_ptr<WhackAStoodentServer::User> user) const
 {
-	return user && blockedUsers.contains(user->GetUserID());
+	return user && (blockedUsers.find(user->GetUserID()) != blockedUsers.end());
 }
 
 /// <summary>
@@ -160,7 +160,7 @@ bool WhackAStoodentServer::User::IsUserBlocked(std::shared_ptr<WhackAStoodentSer
 /// <returns>"true" if specified user has been successfully blocked, otherwise "false"</returns>
 bool WhackAStoodentServer::User::BlockUser(std::shared_ptr<WhackAStoodentServer::User> user)
 {
-	bool ret(!blockedUsers.contains(user->GetUserID()));
+	bool ret(blockedUsers.find(user->GetUserID()) == blockedUsers.end());
 	if (ret)
 	{
 		blockedUsers.insert_or_assign(user->GetUserID(), user);

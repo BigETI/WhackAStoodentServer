@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cstdint>
-#include <span>
 #include <vector>
 
+#include <span.hpp>
 #include <uuid.h>
 
 /// <summary>
@@ -49,7 +49,7 @@ namespace WhackAStoodentServer
 		/// <param name="bytes">Data</param>
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
-		static std::span<const std::uint8_t> DeserializeUUID(std::span<const std::uint8_t> bytes, uuids::uuid& result);
+		static nonstd::span<const std::uint8_t> DeserializeUUID(nonstd::span<const std::uint8_t> bytes, uuids::uuid& result);
 
 		UUIDs& operator=(const UUIDs&) = delete;
 		UUIDs& operator=(UUIDs&&) = delete;

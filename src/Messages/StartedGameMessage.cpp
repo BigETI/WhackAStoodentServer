@@ -66,10 +66,10 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::StartedGameMessage::S
 /// </summary>
 /// <param name="data">Data to deserialize</param>
 /// <returns>Remaining data to deserialize</returns>
-std::span<const std::uint8_t> WhackAStoodentServer::Messages::StartedGameMessage::Deserialize(std::span<const std::uint8_t> data)
+nonstd::span<const std::uint8_t> WhackAStoodentServer::Messages::StartedGameMessage::Deserialize(nonstd::span<const std::uint8_t> data)
 {
 	std::uint8_t your_role;
-	std::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::StartedGame>::Deserialize(data));
+	nonstd::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::StartedGame>::Deserialize(data));
 	next_bytes = WhackAStoodentServer::NumericSerializer::DeserializeByte(next_bytes, your_role);
 	yourRole = static_cast<WhackAStoodentServer::EPlayerRole>(your_role);
 	return WhackAStoodentServer::StringSerializer::DeserializeByteSizedString(next_bytes, opponentName);

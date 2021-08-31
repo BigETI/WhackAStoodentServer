@@ -55,8 +55,8 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::ScoreMoleMessage::Ser
 /// </summary>
 /// <param name="data">Data to deserialize</param>
 /// <returns>Remaining data to deserialize</returns>
-std::span<const std::uint8_t> WhackAStoodentServer::Messages::ScoreMoleMessage::Deserialize(std::span<const std::uint8_t> data)
+nonstd::span<const std::uint8_t> WhackAStoodentServer::Messages::ScoreMoleMessage::Deserialize(nonstd::span<const std::uint8_t> data)
 {
-	std::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::ScoreMole>::Deserialize(data));
+	nonstd::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::ScoreMole>::Deserialize(data));
 	return WhackAStoodentServer::NumericSerializer::DeserializeLong(next_bytes, points);
 }

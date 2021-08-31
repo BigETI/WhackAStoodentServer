@@ -1,8 +1,9 @@
 #pragma once
 
 #include <cstdint>
-#include <span>
 #include <vector>
+
+#include <span.hpp>
 
 #include <Exceptions/DeserializationFailedException.hpp>
 #include <Enumerators/EMessageType.hpp>
@@ -73,10 +74,10 @@ namespace WhackAStoodentServer
 			/// </summary>
 			/// <param name="data">Data to deserialize</param>
 			/// <returns>Remaining data to deserialize</returns>
-			virtual std::span<const std::uint8_t> Deserialize(std::span<const std::uint8_t> data) override
+			virtual nonstd::span<const std::uint8_t> Deserialize(nonstd::span<const std::uint8_t> data) override
 			{
 				std::uint8_t message_type;
-				std::span<const std::uint8_t> ret(NumericSerializer::DeserializeByte(data, message_type));
+				nonstd::span<const std::uint8_t> ret(NumericSerializer::DeserializeByte(data, message_type));
 				if (MessageType != static_cast<EMessageType>(message_type))
 				{
 					throw DeserializationFailedException();

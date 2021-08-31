@@ -69,10 +69,10 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::ErrorMessage::Seriali
 /// </summary>
 /// <param name="data">Data to deserialize</param>
 /// <returns>Remaining data to deserialize</returns>
-std::span<const std::uint8_t> WhackAStoodentServer::Messages::ErrorMessage::Deserialize(std::span<const std::uint8_t> data)
+nonstd::span<const std::uint8_t> WhackAStoodentServer::Messages::ErrorMessage::Deserialize(nonstd::span<const std::uint8_t> data)
 {
 	std::uint8_t error_type_index;
-	std::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Error>::Deserialize(data));
+	nonstd::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Error>::Deserialize(data));
 	next_bytes = WhackAStoodentServer::NumericSerializer::DeserializeByte(next_bytes, error_type_index);
 	errorType = static_cast<WhackAStoodentServer::EErrorType>(error_type_index);
 	return WhackAStoodentServer::StringSerializer::DeserializeIntegerSizedString(next_bytes, errorMessage);

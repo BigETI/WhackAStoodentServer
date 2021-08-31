@@ -81,10 +81,10 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::HitSuccessMessage::Se
 /// </summary>
 /// <param name="data">Data to deserialize</param>
 /// <returns>Remaining data to deserialize</returns>
-std::span<const std::uint8_t> WhackAStoodentServer::Messages::HitSuccessMessage::Deserialize(std::span<const std::uint8_t> data)
+nonstd::span<const std::uint8_t> WhackAStoodentServer::Messages::HitSuccessMessage::Deserialize(nonstd::span<const std::uint8_t> data)
 {
 	std::uint8_t look_hole_index;
-	std::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::HitSuccess>::Deserialize(data));
+	nonstd::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::HitSuccess>::Deserialize(data));
 	next_bytes = WhackAStoodentServer::NumericSerializer::DeserializeByte(next_bytes, look_hole_index);
 	lookHole = static_cast<std::size_t>(look_hole_index);
 	next_bytes = WhackAStoodentServer::NumericSerializer::DeserializeLong(next_bytes, points);

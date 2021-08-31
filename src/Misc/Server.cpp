@@ -1,5 +1,6 @@
 #include <iostream>
-#include <span>
+
+#include <span.hpp>
 
 #include <Enumerators/EMessageType.hpp>
 #include <Enumerators/EPlayerRole.hpp>
@@ -563,7 +564,7 @@ void WhackAStoodentServer::Server::NetworkingThread(Server* server)
 						server->disconnectedPeerQueue.Enqueue(enet_event.peer->incomingPeerID);
 						break;
 					case ENET_EVENT_TYPE_RECEIVE:
-						server->receivedMessageQueue.Enqueue(std::make_pair(enet_event.peer->incomingPeerID, std::make_shared<WhackAStoodentServer::Message>(std::span<const std::uint8_t>(enet_event.packet->data, enet_event.packet->dataLength))));
+						server->receivedMessageQueue.Enqueue(std::make_pair(enet_event.peer->incomingPeerID, std::make_shared<WhackAStoodentServer::Message>(nonstd::span<const std::uint8_t>(enet_event.packet->data, enet_event.packet->dataLength))));
 						enet_packet_destroy(enet_event.packet);
 						break;
 					default:

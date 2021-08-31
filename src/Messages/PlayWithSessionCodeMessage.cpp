@@ -61,8 +61,8 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::PlayWithSessionCodeMe
 /// </summary>
 /// <param name="data">Data to deserialize</param>
 /// <returns>Remaining data to deserialize</returns>
-std::span<const std::uint8_t> WhackAStoodentServer::Messages::PlayWithSessionCodeMessage::Deserialize(std::span<const std::uint8_t> data)
+nonstd::span<const std::uint8_t> WhackAStoodentServer::Messages::PlayWithSessionCodeMessage::Deserialize(nonstd::span<const std::uint8_t> data)
 {
-	std::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::PlayWithSessionCode>::Deserialize(data));
+	nonstd::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::PlayWithSessionCode>::Deserialize(data));
 	return WhackAStoodentServer::SessionCodes::Deserialize(next_bytes, sessionCode);
 }

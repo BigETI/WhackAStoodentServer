@@ -198,9 +198,9 @@ namespace WhackAStoodentServer
 		/// </summary>
 		/// <param name="data">Data to deserialize</param>
 		/// <returns>Remaining data to deserialize</returns>
-		virtual std::span<const std::uint8_t> Deserialize(std::span<const std::uint8_t> data) override
+		virtual nonstd::span<const std::uint8_t> Deserialize(nonstd::span<const std::uint8_t> data) override
 		{
-			std::span<const std::uint8_t> next_bytes(NumericSerializer::Deserialize<T>(data, x));
+			nonstd::span<const std::uint8_t> next_bytes(NumericSerializer::Deserialize<T>(data, x));
 			return NumericSerializer::Deserialize<T>(next_bytes, y);
 		}
 

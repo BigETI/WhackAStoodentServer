@@ -1,7 +1,8 @@
 ﻿#pragma once
 
-#include <span>
 #include <string>
+
+#include <span.hpp>
 
 /// <summary>
 /// Whack-A-Stoodent server namespace
@@ -24,7 +25,7 @@ namespace WhackAStoodentServer
 		/// Main entry point
 		/// </summary>
 		/// <param name="arguments">Arguments</param>
-		static void Main(std::span<const std::string> arguments);
+		static void Main(nonstd::span<const std::string> arguments);
 
 		/// <summary>
 		/// Gets the current exit code

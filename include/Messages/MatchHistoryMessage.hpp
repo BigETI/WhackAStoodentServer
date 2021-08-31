@@ -48,7 +48,7 @@ namespace WhackAStoodentServer
 			/// Gets match history
 			/// </summary>
 			/// <returns>Match history</returns>
-			virtual std::span<const WhackAStoodentServer::MatchHistoryEntry> GetMatchHistory() const;
+			virtual nonstd::span<const WhackAStoodentServer::MatchHistoryEntry> GetMatchHistory() const;
 
 			/// <summary>
 			/// Serializes contents
@@ -62,7 +62,7 @@ namespace WhackAStoodentServer
 			/// </summary>
 			/// <param name="data">Data to deserialize</param>
 			/// <returns>Remaining data to deserialize</returns>
-			virtual std::span<const std::uint8_t> Deserialize(std::span<const std::uint8_t> data) override;
+			virtual nonstd::span<const std::uint8_t> Deserialize(nonstd::span<const std::uint8_t> data) override;
 
 		private:
 

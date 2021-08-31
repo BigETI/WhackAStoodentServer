@@ -2,9 +2,10 @@
 #include <iostream>
 #include <map>
 #include <stdexcept>
-#include <span>
 #include <string>
 #include <thread>
+
+#include <span.hpp>
 
 #include <Misc/Server.hpp>
 #include <Static/Defaults.hpp>
@@ -19,7 +20,7 @@ int WhackAStoodentServer::Program::exitCode(-1);
 /// Main entry point
 /// </summary>
 /// <param name="arguments">Arguments</param>
-void WhackAStoodentServer::Program::Main(std::span<const std::string> arguments)
+void WhackAStoodentServer::Program::Main(nonstd::span<const std::string> arguments)
 {
 	try
 	{

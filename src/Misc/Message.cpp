@@ -6,7 +6,7 @@
 /// Constructs a message
 /// </summary>
 /// <param name="data">Message data</param>
-WhackAStoodentServer::Message::Message(std::span<const std::uint8_t> data) : data(data.begin(), data.end())
+WhackAStoodentServer::Message::Message(nonstd::span<const std::uint8_t> data) : data(data.begin(), data.end())
 {
 	if (data.size() < static_cast<std::size_t>(1))
 	{
@@ -27,7 +27,7 @@ WhackAStoodentServer::EMessageType WhackAStoodentServer::Message::GetMessageType
 /// Gets message data
 /// </summary>
 /// <returns>Message data</returns>
-std::span<const std::uint8_t> WhackAStoodentServer::Message::GetData() const
+nonstd::span<const std::uint8_t> WhackAStoodentServer::Message::GetData() const
 {
 	return data;
 }

@@ -33,7 +33,7 @@ WhackAStoodentServer::Lobby::~Lobby()
 /// <returns>"true" if user is valid, otherwise "false"</returns>
 bool WhackAStoodentServer::Lobby::IsUserValid(std::shared_ptr<WhackAStoodentServer::User> user) const
 {
-	return user && users.contains(user->GetPeer().GetIncomingPeerID());
+	return user && (users.find(user->GetPeer().GetIncomingPeerID()) != users.end());
 }
 
 /// <summary>
@@ -53,14 +53,14 @@ std::shared_ptr<WhackAStoodentServer::User> WhackAStoodentServer::Lobby::CreateU
 	{
 		throw std::invalid_argument("Parameter \"userID\" is not a valid UUID.");
 	}
-	if (userIDToUserLookup.contains(userID))
+	if (userIDToUserLookup.find(userID) != userIDToUserLookup.end())
 	{
 		std::stringstream error_message;
 		error_message << "User ID \"" << userID << "\" is not a valid UUID.";
 		throw std::invalid_argument(error_message.str());
 	}
 	std::string session_code;
-	while (sessionCodeToUserLookup.contains(SessionCodes::CreateSessionCode(session_code)));
+	while (sessionCodeToUserLookup.find(SessionCodes::CreateSessionCode(session_code)) != sessionCodeToUserLookup.end());
 	std::shared_ptr<WhackAStoodentServer::User> ret(std::make_shared<WhackAStoodentServer::User>(peer, userID, username, session_code, 0L));
 	users.insert_or_assign(peer->GetIncomingPeerID(), ret);
 	userIDToUserLookup.insert_or_assign(userID, ret);
@@ -121,7 +121,7 @@ bool WhackAStoodentServer::Lobby::IsPeerAnUser(std::shared_ptr<WhackAStoodentSer
 	{
 		throw std::invalid_argument("Parameter \"peer\" is null.");
 	}
-	return users.contains(peer->GetIncomingPeerID());
+	return users.find(peer->GetIncomingPeerID()) != users.end();
 }
 
 /// <summary>
@@ -163,7 +163,7 @@ std::shared_ptr<WhackAStoodentServer::User> WhackAStoodentServer::Lobby::GetUser
 /// <returns>"true" if successful, otherwise "false"</returns>
 bool WhackAStoodentServer::Lobby::IsUserIDOccupied(const uuids::uuid& userID) const
 {
-	return userIDToUserLookup.contains(userID);
+	return userIDToUserLookup.find(userID) != userIDToUserLookup.end();
 }
 
 /// <summary>
@@ -201,7 +201,7 @@ bool WhackAStoodentServer::Lobby::IsSessionCodeOccupied(std::string_view session
 	{
 		throw std::invalid_argument("Session code is not valid.");
 	}
-	return sessionCodeToUserLookup.contains(std::string(sessionCode));
+	return sessionCodeToUserLookup.find(std::string(sessionCode)) != sessionCodeToUserLookup.end();
 }
 
 /// <summary>
@@ -282,7 +282,9 @@ bool WhackAStoodentServer::Lobby::RemoveUserFromSearch(std::shared_ptr<WhackASto
 	{
 		throw std::invalid_argument("Parameter \"user\" is not valid.");
 	}
-	return IsUserValid(user) && !!gameSearchingUsers.remove(user);
+	bool ret(std::find(gameSearchingUsers.begin(), gameSearchingUsers.end(), user) != gameSearchingUsers.end());
+	gameSearchingUsers.remove(user);
+	return ret;
 }
 
 /// <summary>
@@ -410,7 +412,7 @@ bool WhackAStoodentServer::Lobby::IsUserInAGame(std::shared_ptr<WhackAStoodentSe
 	{
 		throw std::invalid_argument("Parameter \"user\" is not valid.");
 	}
-	return userIDToGameLookup.contains(user->GetUserID());
+	return userIDToGameLookup.find(user->GetUserID()) != userIDToGameLookup.end();
 }
 
 /// <summary>
@@ -497,7 +499,7 @@ void WhackAStoodentServer::Lobby::CreateGame(std::shared_ptr<WhackAStoodentServe
 	std::shared_ptr<WhackAStoodentServer::User> hitter_user(is_swapped ? secondUser : firstUser);
 	std::shared_ptr<WhackAStoodentServer::User> mole_user(is_swapped ? firstUser : secondUser);
 	uuids::uuid game_id;
-	while (games.contains(WhackAStoodentServer::UUIDs::CreateNewUUID(game_id)));
+	while (games.find(WhackAStoodentServer::UUIDs::CreateNewUUID(game_id)) != games.end());
 	std::shared_ptr<WhackAStoodentServer::Game> game(std::make_shared<WhackAStoodentServer::Game>(game_id, hitter_user, mole_user));
 	game->OnGameFinished += [&, game, hitter_user, mole_user]()
 	{

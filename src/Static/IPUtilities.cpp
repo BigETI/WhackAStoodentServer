@@ -1,5 +1,7 @@
 #include <vector>
 
+#include <string.h>
+
 #include <Static/IPUtilities.hpp>
 #include <Static/StringUtilities.hpp>
 
@@ -38,7 +40,7 @@ std::string& WhackAStoodentServer::IPUtilities::GetIPAddressString(const ENetAdd
 	result.resize(static_cast<std::size_t>(45));
 	if (enet_address_get_ip(&enetAddress, result.data(), result.length()) == 0)
 	{
-		result.resize(std::strlen(result.c_str()));
+		result.resize(strlen(result.c_str()));
 	}
 	else
 	{

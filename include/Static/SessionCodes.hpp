@@ -2,10 +2,11 @@
 
 #include <cstdint>
 #include <random>
-#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
+
+#include <span.hpp>
 
 /// <summary>
 /// Whack-A-Stoodent server namespace
@@ -53,7 +54,7 @@ namespace WhackAStoodentServer
 		/// <param name="bytes">Data</param>
 		/// <param name="result">Result</param>
 		/// <returns>Remaining data to be deserialized</returns>
-		static std::span<const std::uint8_t> Deserialize(std::span<const std::uint8_t> bytes, std::string& result);
+		static nonstd::span<const std::uint8_t> Deserialize(nonstd::span<const std::uint8_t> bytes, std::string& result);
 
 		SessionCodes& operator=(const SessionCodes&) = delete;
 		SessionCodes& operator=(SessionCodes&&) = delete;

@@ -2,11 +2,11 @@
 
 #include <array>
 #include <cstdint>
-#include <span>
 #include <string>
 #include <string_view>
 
 #include <enet.h>
+#include <span.hpp>
 
 /// <summary>
 /// Whack-A-Stoodent server namespace

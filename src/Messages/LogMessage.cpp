@@ -69,10 +69,10 @@ std::vector<std::uint8_t>& WhackAStoodentServer::Messages::LogMessage::Serialize
 /// </summary>
 /// <param name="data">Data to deserialize</param>
 /// <returns>Remaining data to deserialize</returns>
-std::span<const std::uint8_t> WhackAStoodentServer::Messages::LogMessage::Deserialize(std::span<const std::uint8_t> data)
+nonstd::span<const std::uint8_t> WhackAStoodentServer::Messages::LogMessage::Deserialize(nonstd::span<const std::uint8_t> data)
 {
 	std::uint8_t log_level_index;
-	std::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Log>::Deserialize(data));
+	nonstd::span<const std::uint8_t> next_bytes(WhackAStoodentServer::Messages::ASerializableMessage<WhackAStoodentServer::EMessageType::Log>::Deserialize(data));
 	next_bytes = WhackAStoodentServer::NumericSerializer::DeserializeByte(next_bytes, log_level_index);
 	logLevel = static_cast<WhackAStoodentServer::ELogLevel>(log_level_index);
 	return WhackAStoodentServer::StringSerializer::DeserializeIntegerSizedString(next_bytes, logMessage);

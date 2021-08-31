@@ -1,5 +1,7 @@
 #include <cstring>
 
+#include <string.h>
+
 #include <Static/NumericSerializer.hpp>
 #include <Static/Rules.hpp>
 #include <Static/SessionCodes.hpp>
@@ -55,7 +57,7 @@ std::vector<std::uint8_t>& WhackAStoodentServer::SessionCodes::Serialize(std::st
 	std::string_view session_code(SessionCodes::IsSessionCodeValid(sessionCode) ? sessionCode : WhackAStoodentServer::SessionCodes::EmptySessionCode);
 	std::size_t offset(result.size());
 	result.resize(result.size() + (WhackAStoodentServer::Rules::SessionCodeCharacterCount * sizeof(std::string::value_type)));
-	std::memcpy(result.data() + offset, session_code.data(), WhackAStoodentServer::Rules::SessionCodeCharacterCount * sizeof(std::string::value_type));
+	memcpy(result.data() + offset, session_code.data(), WhackAStoodentServer::Rules::SessionCodeCharacterCount * sizeof(std::string::value_type));
 	return result;
 }
 
@@ -65,7 +67,7 @@ std::vector<std::uint8_t>& WhackAStoodentServer::SessionCodes::Serialize(std::st
 /// <param name="bytes">Data</param>
 /// <param name="result">Result</param>
 /// <returns>Remaining data to be deserialized</returns>
-std::span<const std::uint8_t> WhackAStoodentServer::SessionCodes::Deserialize(std::span<const std::uint8_t> bytes, std::string& result)
+nonstd::span<const std::uint8_t> WhackAStoodentServer::SessionCodes::Deserialize(nonstd::span<const std::uint8_t> bytes, std::string& result)
 {
 	if (bytes.size() < WhackAStoodentServer::Rules::SessionCodeCharacterCount)
 	{
@@ -75,7 +77,7 @@ std::span<const std::uint8_t> WhackAStoodentServer::SessionCodes::Deserialize(st
 	{
 		result.resize(WhackAStoodentServer::Rules::SessionCodeCharacterCount);
 	}
-	std::memcpy(result.data(), bytes.data(), WhackAStoodentServer::Rules::SessionCodeCharacterCount * sizeof(std::string::value_type));
+	memcpy(result.data(), bytes.data(), WhackAStoodentServer::Rules::SessionCodeCharacterCount * sizeof(std::string::value_type));
 	return bytes.subspan<WhackAStoodentServer::Rules::SessionCodeCharacterCount * sizeof(std::string::value_type)>();
 }
 
