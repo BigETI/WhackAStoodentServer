@@ -1,9 +1,13 @@
 #pragma once
 
-#include <vector>
+#include <cstdint>
+#include <string>
+#include <string_view>
+
+#include <uuid.h>
 
 #include <Abstract/ASerializableMessage.hpp>
-#include <Misc/MatchHistoryEntry.hpp>
+#include <Enumerators/EPlayerRole.hpp>
 
 /// <summary>
 /// Whack-A-Stoodent server namespace
@@ -30,14 +34,14 @@ namespace WhackAStoodentServer
 			/// <summary>
 			/// Constructs an end game message
 			/// </summary>
-			/// <param name="matchHistory">Match history</param>
-			EndGameMessage(const std::vector<WhackAStoodentServer::MatchHistoryEntry>& matchHistory);
-
-			/// <summary>
-			/// Constructs an end game message
-			/// </summary>
-			/// <param name="matchHistory">Match history</param>
-			EndGameMessage(std::vector<WhackAStoodentServer::MatchHistoryEntry>&& matchHistory);
+			/// <param name="sessionID">Session ID</param>
+			/// <param name="yourScore">Your score</param>
+			/// <param name="yourRole">Your role</param>
+			/// <param name="yourName">Your name</param>
+			/// <param name="opponentScore">Opponent's score</param>
+			/// <param name="opponentRole">Opponent's role</param>
+			/// <param name="opponentName">Opponent's name</param>
+			EndGameMessage(const uuids::uuid& sessionID, std::int64_t yourScore, EPlayerRole yourRole, std::wstring_view yourName, std::int64_t opponentScore, EPlayerRole opponentRole, std::wstring_view opponentName);
 
 			/// <summary>
 			/// Destroys end game message
@@ -45,10 +49,47 @@ namespace WhackAStoodentServer
 			virtual ~EndGameMessage() override;
 
 			/// <summary>
-			/// Gets the current match history
+			/// Gets the session ID
 			/// </summary>
-			/// <returns>Match history</returns>
-			virtual const std::vector<WhackAStoodentServer::MatchHistoryEntry>& GetMatchHistory() const;
+			/// <param name="result">Result</param>
+			/// <returns>Session ID</returns>
+			virtual uuids::uuid& GetSessionID(uuids::uuid& result) const;
+
+			/// <summary>
+			/// Gets your score
+			/// </summary>
+			/// <returns>Your score</returns>
+			virtual std::int64_t GetYourScore() const;
+
+			/// <summary>
+			/// Gets your role
+			/// </summary>
+			/// <returns>Your role</returns>
+			virtual EPlayerRole GetYourRole() const;
+
+			/// <summary>
+			/// Gets your name
+			/// </summary>
+			/// <returns>Your name</returns>
+			virtual std::wstring_view GetYourName() const;
+
+			/// <summary>
+			/// Gets the opponent's score
+			/// </summary>
+			/// <returns>Opponent's score</returns>
+			virtual std::int64_t GetOpponentScore() const;
+
+			/// <summary>
+			/// Gets the opponent's role
+			/// </summary>
+			/// <returns>Opponent's role</returns>
+			virtual EPlayerRole GetOpponentRole() const;
+
+			/// <summary>
+			/// Gets the opponent's name
+			/// </summary>
+			/// <returns>Opponent's name</returns>
+			virtual std::wstring_view GetOpponentName() const;
 
 			/// <summary>
 			/// Serializes contents
@@ -67,9 +108,39 @@ namespace WhackAStoodentServer
 		private:
 
 			/// <summary>
-			/// Match history
+			/// Session ID
 			/// </summary>
-			std::vector<WhackAStoodentServer::MatchHistoryEntry> matchHistory;
+			uuids::uuid sessionID;
+
+			/// <summary>
+			/// Your score
+			/// </summary>
+			std::int64_t yourScore;
+
+			/// <summary>
+			/// Your role
+			/// </summary>
+			EPlayerRole yourRole;
+
+			/// <summary>
+			/// Your name
+			/// </summary>
+			std::wstring yourName;
+
+			/// <summary>
+			/// Opponent's score
+			/// </summary>
+			std::int64_t opponentScore;
+
+			/// <summary>
+			/// Opponent's role
+			/// </summary>
+			EPlayerRole opponentRole;
+
+			/// <summary>
+			/// Opponent's name
+			/// </summary>
+			std::wstring opponentName;
 		};
 	}
 }

@@ -1,3 +1,4 @@
+#include <Messages/EndGameMessage.hpp>
 #include <Messages/HideMessage.hpp>
 #include <Messages/HitFailMessage.hpp>
 #include <Messages/HitSuccessMessage.hpp>
@@ -148,6 +149,8 @@ bool WhackAStoodentServer::Game::FinishGame()
 		isGameFinished = true;
 		hitterUser->SetGameLoadedState(false);
 		moleUser->SetGameLoadedState(false);
+		hitterUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::EndGameMessage>(gameID, hitterUser->GetScore(), WhackAStoodentServer::EPlayerRole::Hitter, hitterUser->GetUsername(), moleUser->GetScore(), WhackAStoodentServer::EPlayerRole::Mole, moleUser->GetUsername());
+		moleUser->GetPeer().SendPeerMessage<WhackAStoodentServer::Messages::EndGameMessage>(gameID, moleUser->GetScore(), WhackAStoodentServer::EPlayerRole::Mole, moleUser->GetUsername(), hitterUser->GetScore(), WhackAStoodentServer::EPlayerRole::Hitter, hitterUser->GetUsername());
 		OnGameFinished();
 	}
 	return ret;
